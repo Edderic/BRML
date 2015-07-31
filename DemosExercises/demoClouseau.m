@@ -1,3 +1,9 @@
+% Exercise 1.7. Repeat the Inspector Clouseau scenario, example(1.3), but with
+% the restriction that either the maid or the butler is the murderer, but not
+% both. Explicitly, the probability of the maid being the murderer and not the
+% butler is 0.04, the probability of the butler being the murderer and not the
+% maid is 0.64. Modify demoClouseau.m to implement this.)
+
 function demoClouseau
 %DEMOCLOUSEAU inspector clouseau example
 butler=1; maid=2; knife=3; % Variable order is arbitary
@@ -21,9 +27,9 @@ pot(maid).table(notmurderer)=0.8;
 
 pot(knife).variables=[knife,butler,maid]; % define array below using this variable order
 pot(knife).table(used, notmurderer, notmurderer)=0.3;
-pot(knife).table(used, notmurderer, murderer)   =0.2;
-pot(knife).table(used, murderer,    notmurderer)=0.6;
-pot(knife).table(used, murderer,    murderer)   =0.1;
+pot(knife).table(used, notmurderer, murderer)   =0.04;
+pot(knife).table(used, murderer,    notmurderer)=0.64;
+pot(knife).table(used, murderer,    murderer)   =0.0;
 pot(knife).table(notused,:,:)=1-pot(knife).table(used,:,:); % due to normalisation
 
 jointpot = multpots(pot([butler maid knife])); % joint distribution
