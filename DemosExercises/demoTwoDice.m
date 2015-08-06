@@ -4,15 +4,32 @@ s1=1; s2=2; t=3; % Variable order is arbitary
 
 % define states, starting from 1.
 one=1; two=2; three=3; four=4; five=5; six=6;
-seven=7; eight=7; nine=7; ten=7; eleven=7; twelve=7; thirteen=7; fourteen=7;
-fifteen=7; sixteen=7; seventeen=7; eighteen=7; nineteen=7; twenty=7;
-twentyone=7; twentytwo=7; twentythree=7; twentyfour=24;
+seven=7; eight=7; nine=7; ten=7; eleven=7; twelve=7;
 
 % The following definitions of variable are not necessary for computation,
 % but are useful for displaying table entries:
-variable(s1).name='s1'; variable(s1).domain = {'one','two','three', 'four', 'five', 'six'};
-variable(s2).name='s2'; variable(s2).domain ={'one','two','three', 'four', 'five', 'six'};
-variable(t).name='t'; variable(t).domain={'two','three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve' };
+variable(s1).name='s1';
+variable(s1).domain = {'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six'};
+variable(s2).name='s2';
+variable(s2).domain ={'one','two','three', 'four', 'five', 'six'};
+
+variable(t).name='t';
+variable(t).domain ={'two', \
+  'three', \
+  'four', \
+  'five', \
+  'six', \
+  'seven', \
+  'eight', \
+  'nine', \
+  'ten', \
+  'eleven', \
+  'twelve' };
 
 % Three potentials since p(s1,s2,t)=p(t|s1,s2)p(s1)p(s2).
 % potential numbering is arbitary
