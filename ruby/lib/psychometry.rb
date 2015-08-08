@@ -3,6 +3,7 @@ require_relative 'utils'
 class Psychometry
   def initialize
     @num_pairs = 5
+    @utils = Utils.new(@num_pairs)
   end
 
   def absolute_frequencies_of_matches
@@ -29,7 +30,7 @@ class Psychometry
 
   def num_matches_in_one(permutation)
     (0..@num_pairs-1).inject(0) do |accum_2, index|
-      if permutation[index] == characters[index]
+      if permutation[index] == @utils.characters[index]
         accum_2 += 1
       else
         accum_2
@@ -42,14 +43,10 @@ class Psychometry
   end
 
   def combinations
-    Utils.new(characters).combine(characters, @num_pairs)
+    @utils.combinations(@num_pairs)
   end
 
   def permutation?(combination)
     combination.uniq.length == combination.length
-  end
-
-  def characters
-    ('A'..'Z').to_a[0..@num_pairs-1]
   end
 end
