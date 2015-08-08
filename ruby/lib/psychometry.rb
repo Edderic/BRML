@@ -1,11 +1,14 @@
+require_relative 'utils'
+
 class Psychometry
-  def initialize(num_pairs)
-    @num_pairs = num_pairs
+  def initialize
+    @num_pairs = 5
   end
 
-  def num_expected_matches
+  def absolute_frequencies_of_matches
     permutations.inject(init_hash) do |accum, permutation|
-      accum[num_matches_in_one(permutation)] = accum[num_matches_in_one(permutation)] + 1
+      accum[num_matches_in_one(permutation)] =
+        accum[num_matches_in_one(permutation)] + 1
       accum
     end
   end
@@ -39,13 +42,7 @@ class Psychometry
   end
 
   def combinations
-    characters.inject([]) do |accum_1, char_1|
-      accum_1 | characters.inject([]) do |accum_2, char_2|
-        accum_2 | characters.map do |char_3|
-          [char_1, char_2, char_3]
-        end
-      end
-    end
+    Utils.new(characters).combine(characters, @num_pairs)
   end
 
   def permutation?(combination)
