@@ -73,13 +73,4 @@ describe Battleship::Board do
       expect(@board.best_target.col).to eq 5
     end
   end
-
-  describe '#distribution' do
-    it 'should return the distribution' do
-       require 'byebug'; byebug
-      # distribution = board.distribution
-      #
-      # expect(distribution.probability(0,0)).to eq
-    end
-  end
 end

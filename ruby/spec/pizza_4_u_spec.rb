@@ -38,7 +38,7 @@ describe Pizza4U do
       pizza_4_u = Pizza4U.new
       accuracy = pizza_4_u.accuracy(1000000)
 
-      expect(accuracy).to eq 1/120.0
+      expect(accuracy.round(3)).to eq 0.018
     end
   end
 
