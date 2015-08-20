@@ -4,16 +4,16 @@ module Battleship
 
     attr_reader :row_length, :col_length
 
-
-    def each_point
-
-    end
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
       @col_length = hash.fetch(:col_length)
       @ships = hash.fetch(:ships)
       @misses = hash.fetch(:misses)
       recreate!
+    end
+
+    def max_abs_freq
+      self.max {|point1, point2| point1.abs_freq <=> point2.abs_freq}.abs_freq
     end
 
     def rows

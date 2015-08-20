@@ -67,10 +67,22 @@ describe Battleship::Board do
     end
   end
 
-  describe '#best_target' do
-    it 'returns the point with the highest likelihood of overlapping with a ship' do
-      expect(@board.best_target.row).to eq 1
-      expect(@board.best_target.col).to eq 5
+  describe '#best_targets' do
+    it 'returns the points with the highest likelihood of overlapping with a ship' do
+      def has_point(some_point, occupied_points)
+        occupied_points.any? {|point| point.row == some_point.row && point.col == some_point.col}
+      end
+      expect(has_point(Battleship::Point.new(1,5), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(2,7), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(3,3), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(4,9), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(5,1), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(5,3), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(6,10), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(8,3), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(8,6), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(8,8), @board.best_targets)).to eq true
+      expect(has_point(Battleship::Point.new(10,6), @board.best_targets)).to eq true
     end
   end
 end

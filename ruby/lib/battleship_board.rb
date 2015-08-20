@@ -26,8 +26,8 @@ module Battleship
       10
     end
 
-    def best_target
-      @table.max {|point1, point2| point1.abs_freq <=> point2.abs_freq}
+    def best_targets
+      @table.select {|point| point.abs_freq == @table.max_abs_freq}
     end
 
     def abs_freqs
@@ -47,8 +47,6 @@ module Battleship
     end
 
     def abs_freq_at(point)
-      # Unoriented ship
-      # - does both horiz. and vert. sliding to update the absolute freq
       point_at(point).abs_freq
     end
 
