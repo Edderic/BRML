@@ -14,7 +14,16 @@ module Battleship
     end
 
     def occupies_valid_points?
-      fully_onboard? && !occupies_a_missed_point?
+      fully_onboard? && !occupies_a_missed_point? && occupied_points_unique
+    end
+
+    def occupied_points_unique
+      all_occupied_points = @table.ships.map {|ship| ship.occupied_points }.flatten
+      all_occupied_points.inject(true) do |accum, point|
+        all_occupied_points.select do |some_point|
+          point.same_as?(some_point)
+        end.count == 1 && accum
+      end
     end
 
     def occupies_a_missed_point?

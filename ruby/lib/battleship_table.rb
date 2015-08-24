@@ -2,7 +2,7 @@ module Battleship
   class Table
     include Enumerable
 
-    attr_reader :row_length, :col_length
+    attr_reader :row_length, :col_length, :ships
 
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
@@ -28,6 +28,7 @@ module Battleship
       end
 
       @misses.each {|miss| point_at(miss).miss!}
+      @ships.each {|ship| ship.table = self}
     end
 
     def each(&block)

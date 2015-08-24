@@ -13,6 +13,34 @@ describe Battleship::Ship do
     def @table.col_length; 3; end
   end
 
+  describe '#occupies_valid_points?' do
+    it 'returns false when ship occupies points that have already been occupied' do
+      point_1 = Battleship::Point.new(1,1)
+      point_2 = Battleship::Point.new(1,2)
+      ship_1 = Battleship::HorizontalShip.new(length: 4,
+                                              starting_point: point_1)
+      ship_2 = Battleship::HorizontalShip.new(length: 3,
+                                              starting_point: point_2)
+      ships = [ship_1, ship_2]
+      table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+
+      expect(ship_1).not_to be_occupies_valid_points
+    end
+
+    it 'returns true when ship occupies points that have already been occupied' do
+      point_1 = Battleship::Point.new(1,1)
+      point_2 = Battleship::Point.new(1,5)
+      ship_1 = Battleship::HorizontalShip.new(length: 4,
+                                              starting_point: point_1)
+      ship_2 = Battleship::HorizontalShip.new(length: 3,
+                                              starting_point: point_2)
+      ships = [ship_1, ship_2]
+      table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+
+      expect(ship_1).to be_occupies_valid_points
+    end
+  end
+
   describe '#occupies?(point)' do
     it 'returns true if occupies the point' do
       horizontal_ship = Battleship::HorizontalShip.new(length: 2,
