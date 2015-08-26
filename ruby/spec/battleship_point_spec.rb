@@ -1,6 +1,13 @@
 require 'spec_helper'
 
 describe Battleship::Point do
+  describe '#off_table?' do
+    it 'returns true when off the table' do
+      bp = Battleship::Point.new(1,2, :off_table)
+      expect(bp).to be_off_table
+    end
+  end
+
   describe '#row' do
     it 'should return the row' do
       bp = Battleship::Point.new(1,2)

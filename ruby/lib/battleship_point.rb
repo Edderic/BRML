@@ -10,6 +10,10 @@ module Battleship
       @state = args.first || :untried
     end
 
+    def off_table?
+      @state == :off_table
+    end
+
     def hit!
       @state = :hit
     end
