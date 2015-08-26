@@ -6,7 +6,8 @@ module Battleship
     def initialize(hash)
       @length = hash.fetch(:length)
       @table = hash.fetch(:table) { :no_table_initialized }
-      @starting_point = hash.fetch(:starting_point) { :no_starting_point }
+      @starting_point = hash.fetch(:starting_point) { Battleship::Point.new(1,1) }
+      @sunk = hash.fetch(:sunk) { false }
     end
 
     def start_at(point)
@@ -38,10 +39,12 @@ module Battleship
       !sunk?
     end
 
+    def sink!
+      @sink = true
+    end
+
     def sunk?
-      occupied_points.inject(true) do |accum, occupied_point|
-        accum && @table.hits.any?{|hit| hit.same_as?(occupied_point) }
-      end
+      @sink
     end
   end
 end
