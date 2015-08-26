@@ -33,5 +33,15 @@ module Battleship
     def abs_freq!
       occupied_points.each {|point| point.abs_freq += 1} if self.occupies_valid_points?
     end
+
+    def unsunk?
+      !sunk?
+    end
+
+    def sunk?
+      occupied_points.inject(true) do |accum, occupied_point|
+        accum && @table.hits.any?{|hit| hit.same_as?(occupied_point) }
+      end
+    end
   end
 end
