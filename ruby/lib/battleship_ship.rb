@@ -12,6 +12,15 @@ module Battleship
       @sunk = hash.fetch(:sunk) { false }
     end
 
+    def point(*args)
+      args.flatten!
+      if args.length == 1
+        args[0]
+      else
+        Battleship::Point.new(row: args[0], col: args[1])
+      end
+    end
+
     def start_at(point)
       @starting_point = point
     end

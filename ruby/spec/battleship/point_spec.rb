@@ -1,10 +1,33 @@
 require 'spec_helper'
 
 describe Battleship::Point do
+  describe '#on_a_ship?' do
+    it 'returns true if the point is on a ship' do
+      starting_point = Battleship::Point.new(row: 2, col: 2)
+      ship = Battleship::HorizontalShip.new(starting_point: starting_point, length: 3)
+      ships = [ship]
+      table = Battleship::Table.new(col_length: 10, row_length: 10, ships: ships)
+      point = table.point_at(2,2)
+
+      expect(point).to be_on_a_ship
+    end
+
+    it 'returns false if the point is not on a ship' do
+      starting_point = Battleship::Point.new(row: 2, col: 3)
+      ship = Battleship::HorizontalShip.new(starting_point: starting_point, length: 3)
+      ships = [ship]
+      table = Battleship::Table.new(col_length: 10, row_length: 10, ships: ships)
+      point = table.point_at(2,2)
+
+      expect(point).not_to be_on_a_ship
+    end
+  end
+
   describe '#off_table?' do
     it 'returns true when off the table' do
       table = instance_double('Battleship::Table', row_length: 5, col_length: 5)
       bp = Battleship::Point.new(row: 8, col: 2, table: table)
+
       expect(bp).to be_off_table
     end
   end

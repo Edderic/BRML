@@ -1,8 +1,10 @@
 module Battleship
   class VerticalShip < Battleship::Ship
-    def occupies_point?(row, col)
-      starting_point.col == col &&
-        (starting_point.row...starting_point.row + @length).any? {|item| item == row}
+    def occupies_point?(*args)
+      starting_point.col == point(args).col &&
+        (starting_point.row...starting_point.row + @length).any? do |item|
+        item == point(args).row
+      end
     end
 
     def fully_onboard?

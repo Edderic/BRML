@@ -11,6 +11,10 @@ module Battleship
       @state = hash.fetch(:state) {:untried}
     end
 
+    def on_a_ship?
+      @table.ships.any? {|ship| ship.occupies_point? self }
+    end
+
     def to_s
       "(#{row},#{col})"
     end

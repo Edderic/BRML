@@ -8,7 +8,7 @@ module Battleship
       @row_length = hash.fetch(:row_length)
       @col_length = hash.fetch(:col_length)
       @ships = hash.fetch(:ships)
-      @misses = hash.fetch(:misses)
+      @misses = hash.fetch(:misses) { [] }
       @hits = hash.fetch(:hits) { [] }
       recreate!
     end
@@ -90,7 +90,10 @@ module Battleship
     end
 
     def valid?
-      @ships.all? {|ship| ship.occupies_valid_points?}
+      @ships.all? {|ship| ship.occupies_valid_points?} &&
+        @hits.all? do |hit|
+          hit.on_a_ship?
+        end
     end
 
     def point(args)
