@@ -9,7 +9,7 @@ describe Battleship::HorizontalShip do
     @table = Battleship::Table.new(hash)
 
     def has_point(some_point, occupied_points)
-      occupied_points.any? {|point| point.row == some_point.row && point.col == some_point.col}
+      occupied_points.any? {|point| point.same_as? some_point }
     end
   end
 
