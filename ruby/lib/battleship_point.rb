@@ -1,17 +1,22 @@
 module Battleship
   class Point
     attr_reader :row, :col
-    attr_accessor :abs_freq
+    attr_accessor :abs_freq, :table
 
-    def initialize(row, col, *args)
-      @row = row
-      @col = col
+    def initialize(hash)
+      @row = hash.fetch(:row)
+      @col = hash.fetch(:col)
       @abs_freq = 0
-      @state = args.first || :untried
+      @table = hash.fetch(:table) {:no_table_initialized}
+      @state = hash.fetch(:state) {:untried}
+    end
+
+    def to_s
+      "(#{row},#{col})"
     end
 
     def off_table?
-      @state == :off_table
+      row > @table.row_length || col > @table.col_length
     end
 
     def hit!

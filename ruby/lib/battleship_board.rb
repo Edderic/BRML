@@ -11,7 +11,7 @@ module Battleship
                                      ships: @ships)
       # table should listen to changes in ship status
       # if hit, then recalculate frequencies...
-      @table.recalculate_abs_freq!
+      @table.abs_freq!
     end
 
     def miss?(point)
@@ -30,12 +30,16 @@ module Battleship
       @table.select {|point| point.abs_freq == @table.max_abs_freq}
     end
 
-    def abs_freqs
-      @table.rows.map do |row|
-        row.map do |point|
-          point.abs_freq
+    def normalized_freqs
+      abs_freqs.map do |row|
+        row.map do |abs_freq|
+          abs_freq / @table.max_abs_freq.to_f
         end
       end
+    end
+
+    def abs_freqs
+      @table.abs_freqs
     end
 
     def rel_freqs

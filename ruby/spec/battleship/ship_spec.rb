@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Battleship::Ship do
   before do
-    @starting_point = Battleship::Point.new(1,1)
+    @starting_point = Battleship::Point.new(row: 1, col: 1)
     @table = (1..3).map do |row|
       (1..3).map do |col|
-        Battleship::Point.new(row,col)
+        Battleship::Point.new(row: row,col: col)
       end
     end
 
@@ -24,8 +24,8 @@ describe Battleship::Ship do
 
   describe '#occupies_valid_points?' do
     it 'returns false when ship occupies points that have already been occupied' do
-      point_1 = Battleship::Point.new(1,1)
-      point_2 = Battleship::Point.new(1,2)
+      point_1 = Battleship::Point.new(row: 1, col: 1)
+      point_2 = Battleship::Point.new(row: 1, col: 2)
       ship_1 = Battleship::HorizontalShip.new(length: 4,
                                               starting_point: point_1)
       ship_2 = Battleship::HorizontalShip.new(length: 3,
@@ -37,8 +37,8 @@ describe Battleship::Ship do
     end
 
     it 'returns true when ship occupies points that have already been occupied' do
-      point_1 = Battleship::Point.new(1,1)
-      point_2 = Battleship::Point.new(1,5)
+      point_1 = Battleship::Point.new(row: 1, col: 1)
+      point_2 = Battleship::Point.new(row: 1, col: 5)
       ship_1 = Battleship::HorizontalShip.new(length: 4,
                                               starting_point: point_1)
       ship_2 = Battleship::HorizontalShip.new(length: 3,
@@ -76,9 +76,9 @@ describe Battleship::Ship do
         occupied_points.any? {|point| point.row == some_point.row && point.col == some_point.col}
       end
 
-      expect(has_point(Battleship::Point.new(1,1), occupied_points)).to eq true
-      expect(has_point(Battleship::Point.new(1,2), occupied_points)).to eq true
-      expect(has_point(Battleship::Point.new(1,3), occupied_points)).to eq false
+      expect(has_point(Battleship::Point.new(row: 1, col: 1), occupied_points)).to eq true
+      expect(has_point(Battleship::Point.new(row: 1, col: 2), occupied_points)).to eq true
+      expect(has_point(Battleship::Point.new(row: 1, col: 3), occupied_points)).to eq false
     end
   end
 
@@ -89,7 +89,7 @@ describe Battleship::Ship do
                                                        starting_point: @starting_point)
       expect(horizontal_ship).to be_fully_onboard
 
-      horizontal_ship.start_at(Battleship::Point.new(1,2))
+      horizontal_ship.start_at(Battleship::Point.new(row: 1, col: 2))
       expect(horizontal_ship).to be_fully_onboard
 
     end
@@ -98,7 +98,7 @@ describe Battleship::Ship do
       horizontal_ship = Battleship::HorizontalShip.new(length: 2,
                                                        table: @table,
                                                        starting_point: @starting_point)
-      horizontal_ship.start_at(Battleship::Point.new(1,3))
+      horizontal_ship.start_at(Battleship::Point.new(row: 1, col: 3))
       expect(horizontal_ship).not_to be_fully_onboard
     end
 
@@ -108,8 +108,7 @@ describe Battleship::Ship do
     it 'should default to Point(0,0)' do
       horizontal_ship = Battleship::HorizontalShip.new(length: 2,
                                                        table: @table)
-      default_starting_point = Battleship::Point.new(1,1)
-
+      default_starting_point = Battleship::Point.new(row: 1, col: 1)
       expect(horizontal_ship.starting_point.same_as?(default_starting_point)).to eq true
     end
   end

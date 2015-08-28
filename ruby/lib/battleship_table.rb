@@ -2,18 +2,31 @@ module Battleship
   class Table
     include Enumerable
 
-    attr_reader :row_length, :col_length, :ships
+    attr_reader :row_length, :col_length, :ships, :hits
 
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
       @col_length = hash.fetch(:col_length)
       @ships = hash.fetch(:ships)
       @misses = hash.fetch(:misses)
+      @hits = hash.fetch(:hits) { [] }
       recreate!
+    end
+
+    def unsunk_ships
+      @ships.select {|ship| ship.unsunk? }
     end
 
     def max_abs_freq
       self.max {|point1, point2| point1.abs_freq <=> point2.abs_freq}.abs_freq
+    end
+
+    def abs_freqs
+      rows.map do |row|
+        row.map do |point|
+          point.abs_freq
+        end
+      end
     end
 
     def rows
@@ -21,10 +34,10 @@ module Battleship
     end
 
     def recreate!
-      @table = (1..row_length).inject([]) do |accum1, item1 |
-        accum1 << (1..col_length).inject([]) do |accum2, item2|
-        accum2 << Battleship::Point.new(item1, item2)
-      end
+      @table = (1..row_length).map do |row|
+        (1..col_length).map do |col|
+          Battleship::Point.new(row: row, col: col, table: self)
+        end
       end
 
       @misses.each {|miss| point_at(miss).miss!}
@@ -43,31 +56,51 @@ module Battleship
       self.inject(0) {|accum, point| accum = accum + point.abs_freq }
     end
 
-    def recalculate_abs_freq!
+    def abs_freq!
       recreate!
 
-      @ships.each do |ship|
-        ship.table = self
-        self.each do |point|
-          ship.start_at(point)
-          ship.abs_freq!
-        end
-      end
+      calc_abs_freq!(unsunk_ships, 0)
     end
 
     def point_at(*args)
-      args.flatten!
-      row, col = 0,0
-
-      if args.length == 1
-        point = args.first
-        row, col = point.row, point.col
+      if point(args).off_table?
+        Battleship::Point.new(row: point(args).row,
+                              col: point(args).col,
+                              table: self
+                              )
       else
-        row = args[0]
-        col = args[1]
+        @table[point(args).row - 1][point(args).col - 1]
       end
+    end
 
-      @table[row-1][col-1]
+
+    private
+
+    def calc_abs_freq!(available_ships, index)
+      return if index >= available_ships.length
+
+      available_ship = available_ships[index]
+      each do |point|
+        available_ship.start_at(point)
+        calc_abs_freq!(available_ships, index + 1)
+
+        unsunk_ships.each {|ship| ship.abs_freq! } if valid?
+        # Also need to consider when ship can be oriented differently (vertically vs horizontally)
+      end
+    end
+
+    def valid?
+      @ships.all? {|ship| ship.occupies_valid_points?}
+    end
+
+    def point(args)
+      args.flatten!
+      if args.length == 1
+        args.first.table = self
+        args.first
+      else
+        Battleship::Point.new(row: args[0], col: args[1], table: self)
+      end
     end
   end
 end
