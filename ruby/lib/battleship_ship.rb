@@ -12,12 +12,17 @@ module Battleship
       @sunk = hash.fetch(:sunk) { false }
     end
 
-    def point(*args)
+    def to_s
+      occupied_points.inject("sunk: #{sunk?}:") {|accum, point| "#{accum} #{point},"}[0...-1]
+    end
+
+    def point(args)
       args.flatten!
       if args.length == 1
-        args[0]
+        args.first.table = self
+        args.first
       else
-        Battleship::Point.new(row: args[0], col: args[1])
+        Battleship::Point.new(row: args[0], col: args[1], table: self)
       end
     end
 
@@ -46,7 +51,7 @@ module Battleship
     end
 
     def sunk?
-      @sink
+      !!@sink
     end
 
     private

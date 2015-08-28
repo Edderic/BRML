@@ -12,7 +12,9 @@ module Battleship
     end
 
     def on_a_ship?
-      @table.ships.any? {|ship| ship.occupies_point? self }
+      @table.ships.any? do |ship|
+        ship.occupies_point? self
+      end
     end
 
     def to_s

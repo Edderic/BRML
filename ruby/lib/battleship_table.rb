@@ -40,7 +40,8 @@ module Battleship
         end
       end
 
-      @misses.each {|miss| point_at(miss).miss!}
+      @misses.each {|miss| point_at(miss).miss!; miss.table = self}
+      @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
     end
 
@@ -67,7 +68,7 @@ module Battleship
         Battleship::Point.new(row: point(args).row,
                               col: point(args).col,
                               table: self
-                              )
+                             )
       else
         @table[point(args).row - 1][point(args).col - 1]
       end
@@ -91,9 +92,7 @@ module Battleship
 
     def valid?
       @ships.all? {|ship| ship.occupies_valid_points?} &&
-        @hits.all? do |hit|
-          hit.on_a_ship?
-        end
+        @hits.all? { |hit| hit.table = self; hit.on_a_ship?  }
     end
 
     def point(args)

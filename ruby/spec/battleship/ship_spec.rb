@@ -3,14 +3,19 @@ require 'spec_helper'
 describe Battleship::Ship do
   before do
     @starting_point = Battleship::Point.new(row: 1, col: 1)
-    @table = (1..3).map do |row|
-      (1..3).map do |col|
-        Battleship::Point.new(row: row,col: col)
-      end
-    end
+    @table = Battleship::Table.new(row_length: 5,
+                                   col_length: 5,
+                                   ships: [])
+  end
 
-    def @table.row_length; 3; end
-    def @table.col_length; 3; end
+  describe '#to_s' do
+    it 'should return print out the starting point and occupied_points' do
+      starting_point = Battleship::Point.new(row: 3,col: 4)
+      ship_1 = Battleship::HorizontalShip.new(length: 4, starting_point: starting_point,
+                                             table: @table)
+      ship_1.sink!
+      expect(ship_1.to_s).to eq "sunk: true: (3,4), (3,5), (3,6), (3,7)"
+    end
   end
 
   describe '#sunk?' do
@@ -64,9 +69,6 @@ describe Battleship::Ship do
 
   describe '#occupied_points' do
     it 'returns a list of occupied points' do
-      def @table.point_at(row, col)
-        self[row-1][col-1]
-      end
       horizontal_ship = Battleship::HorizontalShip.new(length: 2,
                                                        table: @table,
                                                        starting_point: @starting_point)
@@ -95,10 +97,10 @@ describe Battleship::Ship do
     end
 
     it 'returns false if part of the ship is off the board' do
-      horizontal_ship = Battleship::HorizontalShip.new(length: 2,
+      horizontal_ship = Battleship::HorizontalShip.new(length: 3,
                                                        table: @table,
                                                        starting_point: @starting_point)
-      horizontal_ship.start_at(Battleship::Point.new(row: 1, col: 3))
+      horizontal_ship.start_at(Battleship::Point.new(row: 4, col: 4))
       expect(horizontal_ship).not_to be_fully_onboard
     end
 
