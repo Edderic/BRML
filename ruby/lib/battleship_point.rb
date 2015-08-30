@@ -33,6 +33,14 @@ module Battleship
       @state == :hit
     end
 
+    def sink!
+      @state = :sunk
+    end
+
+    def sunk?
+      @state == :sunk
+    end
+
     def miss!
       @state = :missed
     end

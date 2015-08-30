@@ -23,6 +23,15 @@ describe Battleship::Point do
     end
   end
 
+  describe '#sink!' do
+    it 'sinks the point' do
+      point = Battleship::Point.new(row: 2, col: 3)
+      point.sink!
+
+      expect(point).to be_sunk
+    end
+  end
+
   describe '#off_table?' do
     it 'returns true when off the table' do
       table = instance_double('Battleship::Table', row_length: 5, col_length: 5)
