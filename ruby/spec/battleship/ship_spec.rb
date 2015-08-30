@@ -27,6 +27,39 @@ describe Battleship::Ship do
     end
   end
 
+  describe 'to_horizontal' do
+    it 'returns a new instance that is horizontal' do
+      starting_point = Battleship::Point.new(row: 1, col: 1)
+      ship = Battleship::Ship.new(length: 3,
+                                  starting_point: starting_point
+                                 )
+      ships = [ship]
+      table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+      horizontal_ship = ship.to_horizontal
+      occupied_points = horizontal_ship.occupied_points
+      expect(occupied_points[0].same_as?(Battleship::Point.new(row: 1,col: 1))).to eq true
+      expect(occupied_points[1].same_as?(Battleship::Point.new(row: 1,col: 2))).to eq true
+      expect(occupied_points[2].same_as?(Battleship::Point.new(row: 1,col: 3))).to eq true
+    end
+  end
+
+
+  describe 'to_vertical' do
+    it 'returns a new instance that is vertical' do
+      starting_point = Battleship::Point.new(row: 1, col: 1)
+      ship = Battleship::Ship.new(length: 3,
+                                  starting_point: starting_point
+                                 )
+      ships = [ship]
+      table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+      vertical_ship = ship.to_vertical
+      occupied_points = vertical_ship.occupied_points
+      expect(occupied_points[0].same_as?(Battleship::Point.new(row: 1,col: 1))).to eq true
+      expect(occupied_points[1].same_as?(Battleship::Point.new(row: 2,col: 1))).to eq true
+      expect(occupied_points[2].same_as?(Battleship::Point.new(row: 3,col: 1))).to eq true
+    end
+  end
+
   describe '#occupies_valid_points?' do
     it 'returns false when ship occupies points that have already been occupied' do
       point_1 = Battleship::Point.new(row: 1, col: 1)

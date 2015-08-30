@@ -54,6 +54,19 @@ module Battleship
       !!@sink
     end
 
+    # used to convert ships of unknown orientation to specified versions
+    def to_vertical
+      Battleship::VerticalShip.new(length: @length,
+                                     starting_point: @starting_point,
+                                     table: @table)
+    end
+
+    def to_horizontal
+      Battleship::HorizontalShip.new(length: @length,
+                                     starting_point: @starting_point,
+                                     table: @table)
+    end
+
     private
 
     def occupied_points_unique
