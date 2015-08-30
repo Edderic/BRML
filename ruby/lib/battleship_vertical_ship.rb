@@ -16,5 +16,9 @@ module Battleship
         @table.point_at(row, @starting_point.col)
       end
     end
+
+    def to_horizontal
+      Battleship::NullShip.new
+    end
   end
 end

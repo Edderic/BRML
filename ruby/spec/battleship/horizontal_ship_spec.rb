@@ -94,4 +94,14 @@ describe Battleship::HorizontalShip do
       expect(horizontal_ship).not_to be_fully_onboard
     end
   end
+
+  describe '#to_vertical' do
+    it 'should return a NullShip' do
+      horizontal_ship = Battleship::HorizontalShip.new(length: 2,
+                                                   table: @table,
+                                                   starting_point: @starting_point)
+      null_ship = horizontal_ship.to_vertical
+      expect(null_ship.class).to eq Battleship::NullShip
+    end
+  end
 end

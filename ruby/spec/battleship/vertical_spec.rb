@@ -83,11 +83,20 @@ describe Battleship::VerticalShip do
   describe '#abs_freq!' do
     it 'should update the values of occupied points' do
       vertical_ship = Battleship::VerticalShip.new(length: 2,
-                                                   orientation: :vertical,
                                                    table: @table,
                                                    starting_point: @starting_point)
       vertical_ship.abs_freq!
       expect(@table.point_at(1,1).abs_freq).to eq 1
+    end
+  end
+
+  describe '#to_horizontal' do
+    it 'should return a NullShip' do
+      vertical_ship = Battleship::VerticalShip.new(length: 2,
+                                                   table: @table,
+                                                   starting_point: @starting_point)
+      null_ship = vertical_ship.to_horizontal
+      expect(null_ship.class).to eq Battleship::NullShip
     end
   end
 end
