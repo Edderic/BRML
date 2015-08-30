@@ -28,6 +28,39 @@ describe Battleship::Table do
     end
   end
 
+  # describe '#' do
+  # end
+
+  describe '#rel_freqs' do
+    describe 'table is 1x3' do
+      describe '1 ship of length 3' do
+        it 'should return [1,1,1]' do
+          ship = Battleship::HorizontalShip.new(length: 3)
+          ships = [ship]
+          table = Battleship::Table.new(row_length: 1,
+                                        col_length: 3,
+                                        misses: [],
+                                        ships: ships)
+          expect(table.rel_freqs.first).to eq [1,1,1]
+        end
+      end
+    end
+
+    describe 'table is 1x4' do
+      describe '1 ship of length 3' do
+        it 'should return [0.5, 1, 1, 0.5]' do
+          ship = Battleship::HorizontalShip.new(length: 3)
+          ships = [ship]
+          table = Battleship::Table.new(row_length: 1,
+                                        col_length: 4,
+                                        misses: [],
+                                        ships: ships)
+          expect(table.rel_freqs.first).to eq [0.5,1,1,0.5]
+        end
+      end
+    end
+  end
+
   describe '#abs_freq!' do
     describe '1x6 board' do
       describe '3 ships of length 2' do

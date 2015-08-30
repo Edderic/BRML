@@ -2,7 +2,7 @@ module Battleship
   class Table
     include Enumerable
 
-    attr_reader :row_length, :col_length, :ships, :hits
+    attr_reader :row_length, :col_length, :ships, :hits, :num_total_configurations
 
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
@@ -11,6 +11,16 @@ module Battleship
       @misses = hash.fetch(:misses) { [] }
       @hits = hash.fetch(:hits) { [] }
       recreate!
+    end
+
+    def rel_freqs
+      abs_freq!
+
+      abs_freqs.map do |row|
+        row.map do |abs_freq|
+          abs_freq / @num_total_configurations.to_f
+        end
+      end
     end
 
     def unsunk_ships
@@ -43,6 +53,7 @@ module Battleship
       @misses.each {|miss| point_at(miss).miss!; miss.table = self}
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
+      @num_total_configurations = 0
     end
 
     def each(&block)
@@ -85,7 +96,7 @@ module Battleship
         available_ship.start_at(point)
         calc_abs_freq!(available_ships, index + 1)
 
-        unsunk_ships.each {|ship| ship.abs_freq! } if valid?
+        unsunk_ships.each {|ship| ship.abs_freq!; @num_total_configurations += 1 } if valid?
         # Also need to consider when ship can be oriented differently (vertically vs horizontally)
       end
     end
