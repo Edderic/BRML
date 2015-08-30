@@ -13,6 +13,20 @@ module Battleship
       recreate!
     end
 
+    def sink!(sink_point, length)
+      unsunk_ships_of_specified_length = unsunk_ships.select {|ship| ship.length == length}
+      # need to make sure that at least one unsunken ship is able to have
+      # all its points covered
+
+      unsunk_ships.first.length
+      unsunk_ships_of_specified_length.each do |unsunk_ship|
+        each do |point|
+          unsunk_ship.start_at(point)
+          unsunk_ship.sink!(sink_point)
+        end
+      end
+    end
+
     def rel_freqs
       abs_freq!
 
@@ -69,7 +83,7 @@ module Battleship
     end
 
     def abs_freq!
-      recreate!
+      # recreate!
 
       calc_abs_freq!(unsunk_ships, 0)
     end
@@ -102,8 +116,8 @@ module Battleship
     end
 
     def valid?
-      @ships.all? {|ship| ship.occupies_valid_points?} &&
-        @hits.all? { |hit| hit.table = self; hit.on_a_ship?  }
+      unsunk_ships.all? {|ship| ship.occupies_valid_points?} &&
+        @hits.all? { |hit| hit.table = self; hit.on_an_unsunk_ship?  }
     end
 
     def point(args)

@@ -17,6 +17,12 @@ module Battleship
       end
     end
 
+    def on_an_unsunk_ship?
+      @table.unsunk_ships.any? do |ship|
+        ship.occupies_point? self
+      end
+    end
+
     def to_s
       "(#{row},#{col})"
     end

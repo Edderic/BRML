@@ -1,6 +1,27 @@
 require 'spec_helper'
 
 describe Battleship::Table do
+  describe '#sink!(point, ship_length)' do
+    describe 'when there are no ambiguities' do
+      it 'sinks the points occupied by the ship that was just sunk' do
+        ship = Battleship::HorizontalShip.new(length: 2)
+        ships = [ship]
+        misses = []
+        hit_1 = Battleship::Point.new(row: 1, col: 1, status: :hit)
+        hit_2 = Battleship::Point.new(row: 1, col: 2)
+
+        hits = [hit_1]
+        hash = {row_length: 1, col_length: 3, ships: ships, misses: misses, hits: hits}
+        table = Battleship::Table.new(hash)
+
+        table.sink!(hit_2, 2)
+
+        expect(table.point_at(hit_1)).to be_sunk
+        expect(table.point_at(hit_2)).to be_sunk
+      end
+    end
+  end
+
   describe '#rows' do
     it 'should return the rows' do
       ships = []
@@ -27,9 +48,6 @@ describe Battleship::Table do
       expect(off_table_point).to be_off_table
     end
   end
-
-  # describe '#' do
-  # end
 
   describe '#rel_freqs' do
     describe 'table is 1x3' do
@@ -116,34 +134,50 @@ describe Battleship::Table do
               first_row_abs_freqs = table.abs_freqs.first
               expect(first_row_abs_freqs).to eq [5,10,10,11,16,23,16,11,8,5]
             end
+
+            describe 'user hits (1,7) and sinks ship of length 2' do
+              it 'gives us the proper absolute frequencies' do
+                hit_1_6 = Battleship::Point.new(row: 1, col: 6, state: :hit)
+                hit_1_7 = Battleship::Point.new(row: 1, col: 7, state: :hit)
+
+                hits = [hit_1_6]
+                ship_length_2 = Battleship::HorizontalShip.new(length: 2)
+                ship_length_3 = Battleship::HorizontalShip.new(length: 3)
+                ships = [ship_length_2, ship_length_3]
+                hash = {col_length: 10, row_length: 1, ships: ships, hits: hits}
+
+                table = Battleship::Table.new(hash)
+                table.sink!(hit_1_7, 2)
+                table.abs_freq!
+
+                first_row_abs_freqs = table.abs_freqs.first
+                expect(first_row_abs_freqs).to eq [1,2,3,2,1,0,0,1,1,1]
+              end
+            end
           end
         end
       end
     end
-
   end
 
   describe '#unsunk_ships' do
     describe 'when there are unsunk ships' do
       it 'returns the unsunk ships' do
+        ship_1 = Battleship::HorizontalShip.new(length: 2)
+        ship_2 = Battleship::HorizontalShip.new(length: 1)
+        ships = [ship_1, ship_2]
         misses = []
-        hit_1_6 = Battleship::Point.new(row: 1, col: 6, state: :hit)
-        hit_1_7 = Battleship::Point.new(row: 1, col: 7, state: :hit)
+        hit_1 = Battleship::Point.new(row: 1, col: 1, status: :hit)
+        hit_2 = Battleship::Point.new(row: 1, col: 2)
 
-        hits = [hit_1_6, hit_1_7]
-
-        ship_length_2 = Battleship::HorizontalShip.new(length: 2)
-        ship_length_3 = Battleship::HorizontalShip.new(length: 3)
-
-        ship_length_2.sink!
-
-        ships = [ship_length_2, ship_length_3]
-
-        hash = {col_length: 10, row_length: 1, ships: ships, misses: misses, hits: hits}
-
+        hits = [hit_1]
+        hash = {row_length: 1, col_length: 5, ships: ships, misses: misses, hits: hits}
         table = Battleship::Table.new(hash)
-        expect(table.unsunk_ships).not_to include(ship_length_2)
-        expect(table.unsunk_ships).to include(ship_length_3)
+
+        table.sink!(hit_2, 2)
+
+        expect( table.unsunk_ships.length).to eq 1
+        expect( table.unsunk_ships[0].length).to eq ship_2.length
       end
     end
   end

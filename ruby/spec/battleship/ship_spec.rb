@@ -14,57 +14,87 @@ describe Battleship::Ship do
 
       ship_1 = Battleship::HorizontalShip.new(length: 1,
                                               starting_point: starting_point
-                                              )
+                                             )
       table = Battleship::Table.new(row_length: 5,
-                                     col_length: 5,
-                                     hits: [starting_point],
-                                     ships: [ship_1])
-      ship_1.sink!
+                                    col_length: 5,
+                                    hits: [],
+                                    ships: [ship_1])
+      ship_1.sink!(starting_point)
       expect(ship_1.to_s).to eq "sunk: true: (3,4)"
     end
   end
 
-  describe '#sink!' do
-    it 'should sink the ship' do
-      starting_point = Battleship::Point.new(row: 1, col: 2)
-      ship_1 = Battleship::HorizontalShip.new(length: 3,
-                                              starting_point: starting_point)
-      ships = [ship_1]
-      hit_1 = Battleship::Point.new(row: 1, col: 2)
-      hit_2 = Battleship::Point.new(row: 1, col: 3)
-      hit_3 = Battleship::Point.new(row: 1, col: 4)
+  describe '#sink!(point)' do
+    describe 'when the point given is sunk and the points of interest are hit or sunk' do
+      it 'should sink the ship' do
+        starting_point = Battleship::Point.new(row: 1, col: 2)
+        ship_1 = Battleship::HorizontalShip.new(length: 3,
+                                                starting_point: starting_point)
+        ships = [ship_1]
+        hit_1 = Battleship::Point.new(row: 1, col: 2)
+        hit_2 = Battleship::Point.new(row: 1, col: 3)
+        hit_3 = Battleship::Point.new(row: 1, col: 4)
 
-      hits = [hit_1, hit_2, hit_3]
-      table = Battleship::Table.new(row_length:1,
-                                    col_length: 4,
-                                    hits: hits,
-                                    ships: ships)
-      ship_1.sink!
+        hits = [hit_1, hit_2]
+        table = Battleship::Table.new(row_length:1,
+                                      col_length: 4,
+                                      hits: hits,
+                                      ships: ships)
+        ship_1.sink!(hit_3)
 
-      expect(ship_1).to be_sunk
-      expect(table.point_at(hit_1)).to be_sunk
-      expect(table.point_at(hit_2)).to be_sunk
-      expect(table.point_at(hit_3)).to be_sunk
+        expect(ship_1).to be_sunk
+        expect(table.point_at(hit_1)).to be_sunk
+        expect(table.point_at(hit_2)).to be_sunk
+        expect(table.point_at(hit_3)).to be_sunk
+      end
+
+      it 'should give the correct occupied points' do
+        starting_point = Battleship::Point.new(row: 1, col: 2)
+        ship_1 = Battleship::HorizontalShip.new(length: 3,
+                                                starting_point: starting_point)
+        ships = [ship_1]
+        hit_1 = Battleship::Point.new(row: 1, col: 2)
+        hit_2 = Battleship::Point.new(row: 1, col: 3)
+        hit_3 = Battleship::Point.new(row: 1, col: 4)
+
+        hits = [hit_1, hit_2]
+        table = Battleship::Table.new(row_length:1,
+                                      col_length: 4,
+                                      hits: hits,
+                                      ships: ships)
+        ship_1.sink!(hit_3)
+
+        occupied_points = ship_1.occupied_points
+        expect(occupied_points[0].same_as?(hit_1)).to eq true
+        expect(occupied_points[1].same_as?(hit_2)).to eq true
+        expect(occupied_points[2].same_as?(hit_3)).to eq true
+        expect(table.point_at(hit_3)).to be_sunk
+      end
+
+      it 'should set the start point' do
+      end
     end
 
-    it 'does not sink the occupied points if not all of them are hits' do
-      starting_point = Battleship::Point.new(row: 1, col: 2)
-      ship_1 = Battleship::HorizontalShip.new(length: 3,
-                                              starting_point: starting_point)
-      ships = [ship_1]
-      hit_1 = Battleship::Point.new(row: 1, col: 2)
-      hit_2 = Battleship::Point.new(row: 1, col: 3)
+    describe 'the points of interest are not hits' do
+      it 'does not sink the occupied points if not all of them are hits' do
+        starting_point = Battleship::Point.new(row: 1, col: 2)
+        ship_1 = Battleship::HorizontalShip.new(length: 3,
+                                                starting_point: starting_point)
+        ships = [ship_1]
+        hit_1 = Battleship::Point.new(row: 1, col: 2)
+        hit_2 = Battleship::Point.new(row: 1, col: 3)
 
-      hits = [hit_1, hit_2]
-      table = Battleship::Table.new(row_length:1,
-                                    col_length: 4,
-                                    hits: hits,
-                                    ships: ships)
-      ship_1.sink!
+        hits = [hit_1]
+        table = Battleship::Table.new(row_length:1,
+                                      col_length: 4,
+                                      hits: hits,
+                                      ships: ships)
+        ship_1.sink!(hit_2)
 
-      expect(ship_1).not_to be_sunk
-      expect(table.point_at(hit_1)).not_to be_sunk
-      expect(table.point_at(hit_2)).not_to be_sunk
+        expect(ship_1).not_to be_sunk
+        expect(table.point_at(hit_1)).not_to be_sunk
+        expect(table.point_at(hit_2)).not_to be_sunk
+      end
     end
   end
 

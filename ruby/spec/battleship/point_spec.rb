@@ -1,6 +1,19 @@
 require 'spec_helper'
 
 describe Battleship::Point do
+  describe '#on_an_unsunk_ship?' do
+    it 'returns true if the point is on an unsunk ship' do
+      starting_point = Battleship::Point.new(row: 2, col: 2)
+      ship = Battleship::HorizontalShip.new(starting_point: starting_point, length: 3)
+      sunk_ship = Battleship::HorizontalShip.new(length: 3, sunk: true)
+      ships = [ship]
+      table = Battleship::Table.new(col_length: 10, row_length: 10, ships: ships)
+      point = table.point_at(2,2)
+
+      expect(point).to be_on_an_unsunk_ship
+    end
+  end
+
   describe '#on_a_ship?' do
     it 'returns true if the point is on a ship' do
       starting_point = Battleship::Point.new(row: 2, col: 2)
