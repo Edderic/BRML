@@ -47,18 +47,21 @@ module Battleship
     end
 
     def sink!
-      @sink = true
+      if occupied_points.all? {|point| point.sunk? || point.hit? }
+        @sunk = true
+        occupied_points.each {|point| point.sink! }
+      end
     end
 
     def sunk?
-      !!@sink
+      @sunk
     end
 
     # used to convert ships of unknown orientation to specified versions
     def to_vertical
       Battleship::VerticalShip.new(length: @length,
-                                     starting_point: @starting_point,
-                                     table: @table)
+                                   starting_point: @starting_point,
+                                   table: @table)
     end
 
     def to_horizontal
