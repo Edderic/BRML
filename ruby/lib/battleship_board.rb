@@ -1,5 +1,11 @@
+require 'forwardable'
+
 module Battleship
   class Board
+    extend Forwardable
+
+    def_delegators :@table, :abs_freqs, :rel_freqs, :point_at
+
     attr_reader :table
 
     def initialize(init_hash)
@@ -38,24 +44,8 @@ module Battleship
       end
     end
 
-    def abs_freqs
-      @table.abs_freqs
-    end
-
-    def rel_freqs
-      abs_freqs.map do |row|
-        row.map do |abs_freq|
-          abs_freq / @table.sum_of_abs_freqs.to_f
-        end
-      end
-    end
-
     def abs_freq_at(point)
       point_at(point).abs_freq
     end
-
-    def point_at(*args)
-      @table.point_at(args)
-   end
   end
 end
