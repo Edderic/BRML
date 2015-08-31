@@ -153,6 +153,31 @@ describe Battleship::Table do
                 first_row_abs_freqs = table.abs_freqs.first
                 expect(first_row_abs_freqs).to eq [1,2,3,2,1,0,0,1,1,1]
               end
+
+              describe 'initialized a different way' do
+                it 'should still give the proper absolute frequencies' do
+                  hit_1_6 = Battleship::Point.new(row: 1, col: 6, state: :hit)
+                  hit_1_7 = Battleship::Point.new(row: 1, col: 7, state: :hit)
+
+                  hits = [hit_1_6]
+                  ship_length_2 = Battleship::HorizontalShip.new(length: 2)
+                  ship_length_3 = Battleship::HorizontalShip.new(length: 3)
+                  ships = [ship_length_2, ship_length_3]
+                  sink_pair_1 = { sink_point: hit_1_7, ship_length: 2}
+                  sink_pairs = [sink_pair_1]
+                  hash = {col_length: 10,
+                          row_length: 1,
+                          ships: ships,
+                          hits: hits,
+                          sink_pairs: sink_pairs}
+
+                  table = Battleship::Table.new(hash)
+                  table.abs_freq!
+
+                  first_row_abs_freqs = table.abs_freqs.first
+                  expect(first_row_abs_freqs).to eq [1,2,3,2,1,0,0,1,1,1]
+                end
+              end
             end
           end
         end

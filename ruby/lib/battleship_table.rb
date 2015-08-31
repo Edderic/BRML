@@ -9,6 +9,7 @@ module Battleship
       @col_length = hash.fetch(:col_length)
       @ships = hash.fetch(:ships)
       @misses = hash.fetch(:misses) { [] }
+      @sink_pairs = hash.fetch(:sink_pairs) { [] }
       @hits = hash.fetch(:hits) { [] }
       recreate!
     end
@@ -67,6 +68,7 @@ module Battleship
       @misses.each {|miss| point_at(miss).miss!; miss.table = self}
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
+      @sink_pairs.each { |sp| sink!(sp[:sink_point], sp[:ship_length]) }
       @num_total_configurations = 0
     end
 
