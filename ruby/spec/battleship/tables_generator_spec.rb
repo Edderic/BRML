@@ -55,14 +55,11 @@ describe Battleship::TablesGenerator do
   describe '#unsunk_ships_combinations' do
     describe 'when there is one horizontal ship of length 2' do
       it 'should only generate one combination' do
-      # it 'should only generate one table with one horizontal ship of length 2' do
         unsunk_ship_1 = Battleship::HorizontalShip.new(length: 2)
         unsunk_ships = [unsunk_ship_1]
         tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
 
-        # require 'byebug'; byebug
-comb = tables_generator.unsunk_ships_combinations
-        expect(tables_generator.unsunk_ships_combinations.count).to eq 1
+        expect(tables_generator.unsunk_ships_combinations.first).to eq unsunk_ship_1
       end
     end
 

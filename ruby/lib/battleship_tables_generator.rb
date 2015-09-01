@@ -10,25 +10,17 @@ module Battleship
       @misses = hash.fetch(:misses) {[]}
       @hits = hash.fetch(:hits) {[]}
       @sunk_pairs = hash.fetch(:sunk_pairs) {[]}
-
-      # for each unsunk ship
-      #   get the horizontal version
-      #     recurse
-      #   get the vertical version
-      #     recurse
-      # return the different configurations
-      # @tables
     end
 
     def unsunk_ships_combinations
-      combine(0, [], [])
+      if unsunk_ships.all? {|ship| ship.class == Battleship::Ship}
+        combine(0, [], [])
+      else
+        @unsunk_ships
+      end
     end
 
     private
-
-    # []
-      # [H_2, H_3]
-      # [H_2, V_3]
 
     def combine(ship_index, combinations, combination)
       if ship_index >= @unsunk_ships.length
@@ -38,15 +30,19 @@ module Battleship
 
       unsunk_ship = @unsunk_ships[ship_index]
 
-      oriented_ship = unsunk_ship.to_horizontal
-      # combination << oriented_ship unless oriented_ship.class == Battleship::NullShip
-      combine(ship_index + 1, combinations, combination.clone << oriented_ship)
-
-      oriented_ship = unsunk_ship.to_vertical
-      # combination << oriented_ship unless oriented_ship.class == Battleship::NullShip
-
-      combine(ship_index + 1, combinations, combination.clone << oriented_ship)
+      combine(ship_index + 1, combinations, ship(ship_index, :to_horizontal, combination))
+      combine(ship_index + 1, combinations, ship(ship_index, :to_vertical, combination))
       combinations
+    end
+
+    def ship(ship_index, orientation, combination)
+      unsunk_ship = @unsunk_ships[ship_index]
+      if unsunk_ship.send(orientation).class == Battleship::NullShip
+        require 'pry'; binding.pry
+        combination.clone
+      else
+        combination.clone << unsunk_ship.send(orientation)
+      end
     end
   end
 end
