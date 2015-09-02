@@ -156,6 +156,17 @@ describe Battleship::Ship do
     end
   end
 
+  describe '#abs_freq!' do
+    it 'does not increase the abs_freq of the hit points' do
+      starting_point = Battleship::Point.new(row: 1, col: 1)
+      ship = Battleship::HorizontalShip.new(length: 2)
+      hits = [starting_point]
+      table = Battleship::Table.new(row_length: 1, col_length: 3, ships: [ship], hits: hits)
+
+      expect(table.abs_freqs.first).to eq [0,1,0]
+    end
+  end
+
   describe '#occupies?(point)' do
     it 'returns true if occupies the point' do
       horizontal_ship = Battleship::HorizontalShip.new(length: 2,

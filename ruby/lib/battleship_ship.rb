@@ -46,7 +46,11 @@ module Battleship
     end
 
     def abs_freq!
-      occupied_points.each {|point| point.abs_freq += 1} if self.occupies_valid_points?
+      return unless self.occupies_valid_points?
+
+      occupied_points.each do |point|
+        point.abs_freq += 1 unless point.hit?
+      end
     end
 
     def unsunk?

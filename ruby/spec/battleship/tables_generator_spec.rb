@@ -61,8 +61,24 @@ describe Battleship::TablesGenerator do
                                                          row_length: 3,
                                                          col_length: 3)
 
-      first_row = tables_generator.abs_freqs.first
-      expect(first_row[0]).to eq 2
+      abs_freqs = tables_generator.abs_freqs
+      expect(abs_freqs).to eq [[2,3,2],[3,4,3],[2,3,2]]
+    end
+
+    describe 'user hits top corner' do
+      it 'should calculate the right absolute frequencies' do
+        ship_1 = Battleship::Ship.new(length: 2)
+        hit_1 = Battleship::Point.new(row: 1, col: 1)
+        ships = [ship_1]
+        hits = [hit_1]
+        tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                           hits: hits,
+                                                           row_length: 3,
+                                                           col_length: 3)
+
+        abs_freqs = tables_generator.abs_freqs
+        expect(abs_freqs).to eq [[0,1,0],[1,0,0],[0,0,0]]
+      end
     end
   end
 

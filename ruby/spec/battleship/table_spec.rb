@@ -132,7 +132,7 @@ describe Battleship::Table do
               table.abs_freq!
 
               first_row_abs_freqs = table.abs_freqs.first
-              expect(first_row_abs_freqs).to eq [5,10,10,11,16,23,16,11,8,5]
+              expect(first_row_abs_freqs).to eq [5,10,10,11,16,0,16,11,8,5]
             end
 
             describe 'user hits (1,7) and sinks ship of length 2' do
