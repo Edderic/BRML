@@ -37,6 +37,10 @@ module Battleship
       reshape(sum_one_dim(points_in_one_dim {|point| point.abs_freq}))
     end
 
+    def num_total_configurations
+      tables.inject(0) {|count, table| count = count + table.num_total_configurations}
+    end
+
     private
 
     # converts rows into one row

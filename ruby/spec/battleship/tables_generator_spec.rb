@@ -53,8 +53,8 @@ describe Battleship::TablesGenerator do
     end
   end
 
-  describe '#abs_freqs' do
-    it 'should generate the tables and sum the absolute frequencies for each point' do
+  describe 'ship of length 2 in 3x3' do
+    it 'abs_freqs should return the proper freqs' do
       ship_1 = Battleship::Ship.new(length: 2)
       ships = [ship_1]
       tables_generator = Battleship::TablesGenerator.new(ships: ships,
@@ -63,6 +63,7 @@ describe Battleship::TablesGenerator do
 
       abs_freqs = tables_generator.abs_freqs
       expect(abs_freqs).to eq [[2,3,2],[3,4,3],[2,3,2]]
+      expect(tables_generator.num_total_configurations).to eq 12
     end
 
     describe 'user hits top corner' do
@@ -78,6 +79,7 @@ describe Battleship::TablesGenerator do
 
         abs_freqs = tables_generator.abs_freqs
         expect(abs_freqs).to eq [[0,1,0],[1,0,0],[0,0,0]]
+        expect(tables_generator.num_total_configurations).to eq 2
       end
     end
   end
