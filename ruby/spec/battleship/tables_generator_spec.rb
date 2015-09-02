@@ -52,6 +52,20 @@ describe Battleship::TablesGenerator do
       expect(tables_generator.sunk_pairs).to be_empty
     end
   end
+
+  describe '#abs_freqs' do
+    it 'should generate the tables and sum the absolute frequencies for each point' do
+      ship_1 = Battleship::Ship.new(length: 2)
+      ships = [ship_1]
+      tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                         row_length: 3,
+                                                         col_length: 3)
+
+      first_row = tables_generator.abs_freqs.first
+      expect(first_row[0]).to eq 2
+    end
+  end
+
   describe '#unsunk_ships_combinations' do
     describe 'when there is one horizontal ship of length 2' do
       it 'should only generate one combination' do
@@ -69,12 +83,10 @@ describe Battleship::TablesGenerator do
         unsunk_ships = [unsunk_ship_1]
         tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
 
-# comb = tables_generator.unsunk_ships_combinations
         first_combination = tables_generator.unsunk_ships_combinations.first
         second_combination = tables_generator.unsunk_ships_combinations[1]
 
         expect(tables_generator.unsunk_ships_combinations.count).to eq 2
-        # require 'byebug'; byebug
         expect(first_combination.count).to eq 1
         expect(first_combination[0].class).to eq Battleship::HorizontalShip
         expect(second_combination.count).to eq 1
@@ -89,7 +101,6 @@ describe Battleship::TablesGenerator do
         unsunk_ships = [unsunk_ship_1, unsunk_ship_2]
         tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
 
-# comb = tables_generator.unsunk_ships_combinations
         combinations = tables_generator.unsunk_ships_combinations
         first_combination = combinations.first
         second_combination = combinations[1]
@@ -97,7 +108,6 @@ describe Battleship::TablesGenerator do
         fourth_combination = combinations[3]
 
         expect(combinations.length).to eq 4
-        # require 'byebug'; byebug
         expect(first_combination.count).to eq 2
         expect(first_combination[0].class).to eq Battleship::HorizontalShip
         expect(first_combination[0].length).to eq 2

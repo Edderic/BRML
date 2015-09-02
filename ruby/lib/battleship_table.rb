@@ -11,7 +11,7 @@ module Battleship
       @misses = hash.fetch(:misses) { [] }
       @sink_pairs = hash.fetch(:sink_pairs) { [] }
       @hits = hash.fetch(:hits) { [] }
-      recreate!
+      abs_freq!
     end
 
     def sink!(sink_point, length)
@@ -85,7 +85,7 @@ module Battleship
     end
 
     def abs_freq!
-      # recreate!
+      recreate!
 
       calc_abs_freq!(unsunk_ships, 0)
     end
