@@ -12,13 +12,12 @@ describe Battleship::Ship do
     it 'should return print out the starting point and occupied_points' do
       starting_point = Battleship::Point.new(row: 3,col: 4)
 
-      ship_1 = Battleship::HorizontalShip.new(length: 1,
-                                              starting_point: starting_point
-                                             )
+      ship_1 = Battleship::HorizontalShip.new(length: 1)
       table = Battleship::Table.new(row_length: 5,
                                     col_length: 5,
                                     hits: [],
                                     ships: [ship_1])
+      ship_1.start_at(starting_point)
       ship_1.sink!(starting_point)
       expect(ship_1.to_s).to eq "sunk: true: (3,4)"
     end
@@ -28,8 +27,7 @@ describe Battleship::Ship do
     describe 'when the point given is sunk and the points of interest are hit or sunk' do
       it 'should sink the ship' do
         starting_point = Battleship::Point.new(row: 1, col: 2)
-        ship_1 = Battleship::HorizontalShip.new(length: 3,
-                                                starting_point: starting_point)
+        ship_1 = Battleship::HorizontalShip.new(length: 3)
         ships = [ship_1]
         hit_1 = Battleship::Point.new(row: 1, col: 2)
         hit_2 = Battleship::Point.new(row: 1, col: 3)
@@ -40,6 +38,7 @@ describe Battleship::Ship do
                                       col_length: 4,
                                       hits: hits,
                                       ships: ships)
+        ship_1.start_at(starting_point)
         ship_1.sink!(hit_3)
 
         expect(ship_1).to be_sunk
@@ -50,8 +49,7 @@ describe Battleship::Ship do
 
       it 'should give the correct occupied points' do
         starting_point = Battleship::Point.new(row: 1, col: 2)
-        ship_1 = Battleship::HorizontalShip.new(length: 3,
-                                                starting_point: starting_point)
+        ship_1 = Battleship::HorizontalShip.new(length: 3)
         ships = [ship_1]
         hit_1 = Battleship::Point.new(row: 1, col: 2)
         hit_2 = Battleship::Point.new(row: 1, col: 3)
@@ -62,6 +60,7 @@ describe Battleship::Ship do
                                       col_length: 4,
                                       hits: hits,
                                       ships: ships)
+        ship_1.start_at(starting_point)
         ship_1.sink!(hit_3)
 
         occupied_points = ship_1.occupied_points
@@ -101,13 +100,13 @@ describe Battleship::Ship do
   describe 'to_horizontal' do
     it 'returns a new instance that is horizontal' do
       starting_point = Battleship::Point.new(row: 1, col: 1)
-      ship = Battleship::Ship.new(length: 3,
-                                  starting_point: starting_point
-                                 )
-      ships = [ship]
+      horizontal_ship = Battleship::Ship.new(length: 3).to_horizontal
+      ships = [horizontal_ship]
       table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
-      horizontal_ship = ship.to_horizontal
+
+      horizontal_ship.start_at(starting_point)
       occupied_points = horizontal_ship.occupied_points
+
       expect(occupied_points[0].same_as?(Battleship::Point.new(row: 1,col: 1))).to eq true
       expect(occupied_points[1].same_as?(Battleship::Point.new(row: 1,col: 2))).to eq true
       expect(occupied_points[2].same_as?(Battleship::Point.new(row: 1,col: 3))).to eq true
@@ -118,12 +117,10 @@ describe Battleship::Ship do
   describe 'to_vertical' do
     it 'returns a new instance that is vertical' do
       starting_point = Battleship::Point.new(row: 1, col: 1)
-      ship = Battleship::Ship.new(length: 3,
-                                  starting_point: starting_point
-                                 )
-      ships = [ship]
+      vertical_ship = Battleship::Ship.new(length: 3).to_vertical
+      ships = [vertical_ship]
       table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
-      vertical_ship = ship.to_vertical
+      vertical_ship.start_at(starting_point)
       occupied_points = vertical_ship.occupied_points
       expect(occupied_points[0].same_as?(Battleship::Point.new(row: 1,col: 1))).to eq true
       expect(occupied_points[1].same_as?(Battleship::Point.new(row: 2,col: 1))).to eq true
@@ -148,12 +145,12 @@ describe Battleship::Ship do
     it 'returns true when ship occupies points that have already been occupied' do
       point_1 = Battleship::Point.new(row: 1, col: 1)
       point_2 = Battleship::Point.new(row: 1, col: 5)
-      ship_1 = Battleship::HorizontalShip.new(length: 4,
-                                              starting_point: point_1)
-      ship_2 = Battleship::HorizontalShip.new(length: 3,
-                                              starting_point: point_2)
+      ship_1 = Battleship::HorizontalShip.new(length: 4)
+      ship_2 = Battleship::HorizontalShip.new(length: 3)
       ships = [ship_1, ship_2]
       table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+
+      ship_1.start_at(point_1)
 
       expect(ship_1).to be_occupies_valid_points
     end

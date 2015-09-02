@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe Battleship::TablesGenerator do
-  describe '#unsunk_ships' do
+  describe '#ships' do
     it 'returns the unsunk ships' do
-      unsunk_ships = double('unsunk_ships')
-      tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
-      expect(tables_generator.unsunk_ships).to eq unsunk_ships
+      ships = double('ships')
+      tables_generator = Battleship::TablesGenerator.new(ships: ships)
+      expect(tables_generator.ships).to eq ships
     end
 
     it 'returns empty array if there are none passed' do
       tables_generator = Battleship::TablesGenerator.new({})
-      expect(tables_generator.unsunk_ships).to be_empty
+      expect(tables_generator.ships).to be_empty
     end
   end
 
@@ -66,27 +66,27 @@ describe Battleship::TablesGenerator do
     end
   end
 
-  describe '#unsunk_ships_combinations' do
+  describe '#ships_combinations' do
     describe 'when there is one horizontal ship of length 2' do
       it 'should only generate one combination' do
-        unsunk_ship_1 = Battleship::HorizontalShip.new(length: 2)
-        unsunk_ships = [unsunk_ship_1]
-        tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
+        ship_1 = Battleship::HorizontalShip.new(length: 2)
+        ships = [ship_1]
+        tables_generator = Battleship::TablesGenerator.new(ships: ships)
 
-        expect(tables_generator.unsunk_ships_combinations.first).to eq unsunk_ship_1
+        expect(tables_generator.ships_combinations.first).to eq ship_1
       end
     end
 
     describe 'when there is one ship of length 2 and unspecified orientation' do
       it 'should generate two combinations' do
-        unsunk_ship_1 = Battleship::Ship.new(length: 2)
-        unsunk_ships = [unsunk_ship_1]
-        tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
+        ship_1 = Battleship::Ship.new(length: 2)
+        ships = [ship_1]
+        tables_generator = Battleship::TablesGenerator.new(ships: ships)
 
-        first_combination = tables_generator.unsunk_ships_combinations.first
-        second_combination = tables_generator.unsunk_ships_combinations[1]
+        first_combination = tables_generator.ships_combinations.first
+        second_combination = tables_generator.ships_combinations[1]
 
-        expect(tables_generator.unsunk_ships_combinations.count).to eq 2
+        expect(tables_generator.ships_combinations.count).to eq 2
         expect(first_combination.count).to eq 1
         expect(first_combination[0].class).to eq Battleship::HorizontalShip
         expect(second_combination.count).to eq 1
@@ -96,12 +96,12 @@ describe Battleship::TablesGenerator do
 
     describe 'when there are two ships of unspecified orientation' do
       it 'should generate four combinations [H_x,H_y], [H_x, V_y], [V_x, H_y], [V_x, V_y]' do
-        unsunk_ship_1 = Battleship::Ship.new(length: 2)
-        unsunk_ship_2 = Battleship::Ship.new(length: 3)
-        unsunk_ships = [unsunk_ship_1, unsunk_ship_2]
-        tables_generator = Battleship::TablesGenerator.new(unsunk_ships: unsunk_ships)
+        ship_1 = Battleship::Ship.new(length: 2)
+        ship_2 = Battleship::Ship.new(length: 3)
+        ships = [ship_1, ship_2]
+        tables_generator = Battleship::TablesGenerator.new(ships: ships)
 
-        combinations = tables_generator.unsunk_ships_combinations
+        combinations = tables_generator.ships_combinations
         first_combination = combinations.first
         second_combination = combinations[1]
         third_combination = combinations[2]

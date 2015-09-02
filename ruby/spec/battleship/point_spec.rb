@@ -4,11 +4,17 @@ describe Battleship::Point do
   describe '#on_an_unsunk_ship?' do
     it 'returns true if the point is on an unsunk ship' do
       starting_point = Battleship::Point.new(row: 2, col: 2)
-      ship = Battleship::HorizontalShip.new(starting_point: starting_point, length: 3)
-      sunk_ship = Battleship::HorizontalShip.new(length: 3, sunk: true)
+      ship = Battleship::HorizontalShip.new(length: 3)
+      hit_1 = Battleship::Point.new(row:2, col:2)
+      hits = [hit_1]
       ships = [ship]
-      table = Battleship::Table.new(col_length: 10, row_length: 10, ships: ships)
+      table = Battleship::Table.new(col_length: 10,
+                                    row_length: 10,
+                                    hits: hits,
+                                    ships: ships)
       point = table.point_at(2,2)
+
+      ship.start_at(starting_point)
 
       expect(point).to be_on_an_unsunk_ship
     end
@@ -17,10 +23,11 @@ describe Battleship::Point do
   describe '#on_a_ship?' do
     it 'returns true if the point is on a ship' do
       starting_point = Battleship::Point.new(row: 2, col: 2)
-      ship = Battleship::HorizontalShip.new(starting_point: starting_point, length: 3)
+      ship = Battleship::HorizontalShip.new(length: 3)
       ships = [ship]
       table = Battleship::Table.new(col_length: 10, row_length: 10, ships: ships)
       point = table.point_at(2,2)
+      ship.start_at(starting_point)
 
       expect(point).to be_on_a_ship
     end
