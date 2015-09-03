@@ -4,12 +4,12 @@
 
 module Battleship
   class TablesGenerator
-    attr_reader :tables, :misses, :hits, :sunk_pairs, :row_length, :col_length, :ships
+    attr_reader :tables, :misses, :hits, :sink_pairs, :row_length, :col_length, :ships
     def initialize(hash)
       @ships = hash.fetch(:ships) {[]}
       @misses = hash.fetch(:misses) {[]}
       @hits = hash.fetch(:hits) {[]}
-      @sunk_pairs = hash.fetch(:sunk_pairs) {[]}
+      @sink_pairs = hash.fetch(:sink_pairs) {[]}
       @row_length = hash.fetch(:row_length) {[]}
       @col_length = hash.fetch(:col_length) {[]}
     end
@@ -27,7 +27,7 @@ module Battleship
         Battleship::Table.new(row_length: row_length,
                               col_length: col_length,
                               ships: ships_combo,
-                              sunk_pairs: sunk_pairs,
+                              sink_pairs: sink_pairs,
                               misses: misses,
                               hits: hits)
       end

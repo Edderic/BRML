@@ -65,6 +65,7 @@ module Battleship
         end
       end
 
+      @hits = @hits.map {|hit| hit.clone}
       @misses.each {|miss| point_at(miss).miss!; miss.table = self}
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}

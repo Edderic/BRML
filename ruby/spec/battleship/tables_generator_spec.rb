@@ -40,16 +40,16 @@ describe Battleship::TablesGenerator do
     end
   end
 
-  describe '#sunk_pairs' do
-    it 'returns the sunk_pairs ships' do
-      sunk_pairs = double('sunk_pairs')
-      tables_generator = Battleship::TablesGenerator.new(sunk_pairs: sunk_pairs)
-      expect(tables_generator.sunk_pairs).to eq sunk_pairs
+  describe '#sink_pairs' do
+    it 'returns the sink_pairs ships' do
+      sink_pairs = double('sink_pairs')
+      tables_generator = Battleship::TablesGenerator.new(sink_pairs: sink_pairs)
+      expect(tables_generator.sink_pairs).to eq sink_pairs
     end
 
     it 'returns empty array if there are none passed' do
       tables_generator = Battleship::TablesGenerator.new({})
-      expect(tables_generator.sunk_pairs).to be_empty
+      expect(tables_generator.sink_pairs).to be_empty
     end
   end
 
@@ -80,6 +80,27 @@ describe Battleship::TablesGenerator do
         abs_freqs = tables_generator.abs_freqs
         expect(abs_freqs).to eq [[0,1,0],[1,0,0],[0,0,0]]
         expect(tables_generator.num_total_configurations).to eq 2
+      end
+
+      describe 'user sinks the ship' do
+        it 'all abs freqs should be 0' do
+
+          ship_1 = Battleship::Ship.new(length: 2)
+          hit_1 = Battleship::Point.new(row: 1, col: 1)
+          sink_point = Battleship::Point.new(row: 1, col: 2)
+          ships = [ship_1]
+          hits = [hit_1]
+          sink_pairs = [{sink_point: sink_point, ship_length: 2} ]
+          tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                             hits: hits,
+                                                             sink_pairs: sink_pairs,
+                                                             row_length: 3,
+                                                             col_length: 3)
+
+          abs_freqs = tables_generator.abs_freqs
+          expect(abs_freqs).to eq [[0,0,0],[0,0,0],[0,0,0]]
+          expect(tables_generator.num_total_configurations).to eq 0
+        end
       end
     end
   end
