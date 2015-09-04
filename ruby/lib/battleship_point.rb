@@ -11,6 +11,15 @@ module Battleship
       @state = hash.fetch(:state) {:untried}
     end
 
+    def neighboring_points
+      [
+        @table.point_at(row-1, col),
+        @table.point_at(row+1, col),
+        @table.point_at(row, col+1),
+        @table.point_at(row, col-1)
+      ]
+    end
+
     def on_a_ship?
       @table.ships.any? do |ship|
         ship.occupies_point? self

@@ -1,6 +1,29 @@
 require 'spec_helper'
 
 describe Battleship::Point do
+  describe '#neighboring_points' do
+    it 'should return the neighboring points in the table' do
+      ships = []
+      table = Battleship::Table.new(col_length: 10,
+                                    row_length: 10,
+                                    ships: ships)
+      starting_point = Battleship::Point.new(row: 2, col: 2)
+      starting_point.table = table
+
+      def has_neighbor(point, row,col)
+        neighbors = point.neighboring_points
+        has_the_neigbor = neighbors.any? {|point| point.same_as?(Battleship::Point.new(row: row, col: col))}
+
+        expect(has_the_neigbor).to eq true
+      end
+
+      has_neighbor(starting_point, 2,1)
+      has_neighbor(starting_point, 2,3)
+      has_neighbor(starting_point, 1,2)
+      has_neighbor(starting_point, 3,2)
+    end
+  end
+
   describe '#on_an_unsunk_ship?' do
     it 'returns true if the point is on an unsunk ship' do
       starting_point = Battleship::Point.new(row: 2, col: 2)
