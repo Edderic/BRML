@@ -33,7 +33,7 @@ module Battleship
     end
 
     def to_s
-      "(#{row},#{col} | #{@state})"
+      "(#{row},#{col} | #{@state.to_s[0]} | #{abs_freq})"
     end
 
     def off_table?
