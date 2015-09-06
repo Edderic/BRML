@@ -18,9 +18,11 @@ describe Battleship::Table do
                                      sink_pairs: sink_pairs,
                                      row_length: 3,
                                      col_length: 3)
-      expect(table.to_s).to eq [["(1,1 | h)", "(1,2 | u)", "(1,3 | h)"],
-                               ["(2,1 | u)", "(2,2 | u)", "(2,3 | u)"],
-                               ["(3,1 | u)", "(3,2 | u)", "(3,3 | u)"]]
+      expect(table.to_s).to eq "(1,1 | h) (1,2 | u) (1,3 | h)\n" +
+                               "(2,1 | u) (2,2 | u) (2,3 | u)\n" +
+                               "(3,1 | u) (3,2 | u) (3,3 | u)\n" +
+                               "sunk: false: (1,1 | h), (1,2 | u)\n" +
+                               "sunk: false: (1,1 | h), (1,2 | u)\n"
     end
   end
 

@@ -26,11 +26,11 @@ module Battleship
     end
 
     def to_s
-      (1..row_length).map do |row|
-        (1..col_length).map do |col|
-          point_at(row, col).to_s
-        end
-      end
+      (1..row_length).inject("") do |total_str, row|
+        total_str + (1..col_length).inject("") do |row_str, col|
+          "#{row_str}#{point_at(row, col).to_s} "
+        end.rstrip + "\n"
+      end + ships.inject("") {|str, ship| "#{str}#{ship.to_s}\n"}.lstrip
     end
 
     def num_times_matching_sink_pair
