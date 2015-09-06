@@ -1,3 +1,7 @@
+# Battleship::Table is designed to only take ships with specified orientation.
+# This means that ships must be either a Battleship::HorizontalShip, or a
+# Battleship::VerticalShip.
+
 module Battleship
   class Table
     @@count = 0
@@ -19,6 +23,14 @@ module Battleship
       @hits = hash.fetch(:hits) { [] }
       # abs_freq!
       recreate!
+    end
+
+    def to_s
+      (1..row_length).map do |row|
+        (1..col_length).map do |col|
+          point_at(row, col).to_s
+        end
+      end
     end
 
     def num_times_matching_sink_pair
