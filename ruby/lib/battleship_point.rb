@@ -33,7 +33,7 @@ module Battleship
     end
 
     def to_s
-      "(#{row},#{col})"
+      "(#{row},#{col} | #{@state})"
     end
 
     def off_table?

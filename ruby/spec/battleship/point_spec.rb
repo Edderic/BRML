@@ -87,7 +87,7 @@ describe Battleship::Point do
   describe '#to_s' do
     it 'returns (row, col)' do
       bp = Battleship::Point.new(row: 1, col: 2)
-      expect(bp.to_s).to eq "(1,2)"
+      expect(bp.to_s).to eq "(1,2 | u)"
     end
   end
 
