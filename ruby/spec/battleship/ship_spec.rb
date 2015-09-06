@@ -148,9 +148,13 @@ describe Battleship::Ship do
       ship_1 = Battleship::HorizontalShip.new(length: 4)
       ship_2 = Battleship::HorizontalShip.new(length: 3)
       ships = [ship_1, ship_2]
-      table = Battleship::Table.new(row_length: 1, col_length: 10, ships: ships, misses: [])
+      table = Battleship::Table.new(row_length: 1,
+                                    col_length: 10,
+                                    ships: ships,
+                                    misses: [])
 
       ship_1.start_at(point_1)
+      ship_2.start_at(point_2)
 
       expect(ship_1).to be_occupies_valid_points
     end
@@ -161,8 +165,11 @@ describe Battleship::Ship do
       starting_point = Battleship::Point.new(row: 1, col: 1)
       ship = Battleship::HorizontalShip.new(length: 2)
       hits = [starting_point]
-      table = Battleship::Table.new(row_length: 1, col_length: 3, ships: [ship], hits: hits)
-
+      table = Battleship::Table.new(row_length: 1,
+                                    col_length: 3,
+                                    ships: [ship],
+                                    hits: hits)
+      table.abs_freq!
       expect(table.abs_freqs.first).to eq [0,1,0]
     end
   end

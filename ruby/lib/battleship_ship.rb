@@ -57,13 +57,21 @@ module Battleship
       !sunk?
     end
 
+    def sinkable?(sink_point)
+      occupied_points.select {|point| point.sunk? || point.hit? }.count >= occupied_points.length - 1 &&
+        @table.point_at(sink_point).untried? &&
+        occupied_points.any? {|point| point.same_as?(sink_point)}
+
+    end
+
     def sink!(sink_point)
-      if occupied_points.select {|point| point.sunk? || point.hit? }.count >= occupied_points.length - 1 && @table.point_at(sink_point).untried? && occupied_points.any? {|point| point.same_as?(sink_point)}
+      if sinkable?(sink_point)
         @sunk = true
         occupied_points.each do |point|
           point.sink!
           @table.hits.reject! {|hit| hit.same_as?(point) }
         end
+        @table.point_at(sink_point).sink!
       end
     end
 

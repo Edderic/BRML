@@ -10,8 +10,11 @@ module Battleship
       @misses = hash.fetch(:misses) {[]}
       @hits = hash.fetch(:hits) {[]}
       @sink_pairs = hash.fetch(:sink_pairs) {[]}
-      @row_length = hash.fetch(:row_length) {[]}
-      @col_length = hash.fetch(:col_length) {[]}
+      @row_length = hash.fetch(:row_length)
+      @col_length = hash.fetch(:col_length)
+
+      @sink_pairs.each {|sunk_pair| sunk_pair.tables_generator = self}
+      @tables = reinitialize_tables
     end
 
     def ships_combinations
@@ -22,18 +25,33 @@ module Battleship
       end
     end
 
-    def tables
+    def num_times_matching_sink_pair
+      tables.inject(0) do |count, table|
+        count = count + table.num_times_matching_sink_pair
+      end
+    end
+
+    def reinitialize_tables
       ships_combinations.map do |ships_combo|
-        Battleship::Table.new(row_length: row_length,
+        table = Battleship::Table.new(row_length: row_length,
                               col_length: col_length,
-                              ships: ships_combo,
+                              ships: Array(ships_combo),
                               sink_pairs: sink_pairs,
                               misses: misses,
                               hits: hits)
+        table.recreate!
+        table
       end
     end
 
     def abs_freqs
+      filtered_tables.each do |table|
+        sink_pairs.each do |sink_pair|
+          table.sink!(sink_pair.sink_point, sink_pair.sink_ship_length)
+        end
+      end
+
+      @tables.each {|table| table.abs_freq!}
       reshape(sum_one_dim(points_in_one_dim {|point| point.abs_freq}))
     end
 
@@ -45,10 +63,26 @@ module Battleship
 
     # converts rows into one row
     def points_in_one_dim(&block)
-      tables.map do |table|
+      filtered_tables.map do |table|
         table.map do |point|
           yield point
         end
+      end
+    end
+
+    def filtered_tables
+      if num_times_matching_sink_pair == 1
+        tables.select {|table| table.num_times_matching_sink_pair == 1}
+      elsif num_times_matching_sink_pair == 0 && !sink_pairs.empty?
+        null_table = Battleship::Table.new(row_length: row_length,
+                                    col_length: col_length,
+                                   ships: [])
+        def null_table.num_total_configurations
+          0
+        end
+        [null_table]
+      else
+        tables
       end
     end
 

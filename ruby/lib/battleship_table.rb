@@ -1,8 +1,14 @@
 module Battleship
   class Table
+    @@count = 0
     include Enumerable
 
-    attr_reader :row_length, :col_length, :ships, :hits, :num_total_configurations
+    attr_reader :row_length,
+      :col_length,
+      :ships,
+      :hits,
+      :num_total_configurations,
+      :sink_pairs
 
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
@@ -11,16 +17,35 @@ module Battleship
       @misses = hash.fetch(:misses) { [] }
       @sink_pairs = hash.fetch(:sink_pairs) { [] }
       @hits = hash.fetch(:hits) { [] }
-      abs_freq!
+      # abs_freq!
+      recreate!
+    end
+
+    def num_times_matching_sink_pair
+      if sink_pairs.empty?
+        return 0
+      end
+
+      count = 0
+
+      sink_pair = sink_pairs.first
+      sink_ship_length = sink_pair.sink_ship_length
+      sink_point = sink_pair.sink_point
+      unsunk_ships_of_specified_length(sink_ship_length).each do |unsunk_ship|
+        each do |point|
+          unsunk_ship.start_at(point)
+          count += 1 if unsunk_ship.sinkable?(sink_point)
+        end
+      end
+
+      count
     end
 
     def sink!(sink_point, length)
-      unsunk_ships_of_specified_length = unsunk_ships.select {|ship| ship.length == length}
       # need to make sure that at least one unsunken ship is able to have
       # all its points covered
 
-      unsunk_ships.first.length
-      unsunk_ships_of_specified_length.each do |unsunk_ship|
+      unsunk_ships_of_specified_length(length).each do |unsunk_ship|
         each do |point|
           unsunk_ship.start_at(point)
           unsunk_ship.sink!(sink_point)
@@ -69,7 +94,7 @@ module Battleship
       @misses.each {|miss| point_at(miss).miss!; miss.table = self}
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
-      @sink_pairs.each { |sp| sink!(sp[:sink_point], sp[:ship_length]) }
+      # @sink_pairs.each { |sp| sink!(sp[:sink_point], sp[:ship_length]) }
       @num_total_configurations = 0
     end
 
@@ -114,7 +139,6 @@ module Battleship
         calc_abs_freq!(available_ships, index + 1)
 
         unsunk_ships.each {|ship| ship.abs_freq!; @num_total_configurations += 1 } if valid?
-        # Also need to consider when ship can be oriented differently (vertically vs horizontally)
       end
     end
 
@@ -131,6 +155,10 @@ module Battleship
       else
         Battleship::Point.new(row: args[0], col: args[1], table: self)
       end
+    end
+
+    def unsunk_ships_of_specified_length(length)
+      unsunk_ships.select {|ship| ship.length == length}
     end
   end
 end
