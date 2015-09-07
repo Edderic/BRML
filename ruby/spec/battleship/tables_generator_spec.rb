@@ -1,6 +1,63 @@
 require 'spec_helper'
 
 describe Battleship::TablesGenerator do
+  describe 'ambiguous sinking' do
+
+    # -------
+    # |x|s|x| ambiguous if length 2, unambiguous if length 3
+    # -------
+    # | | | |
+    # -------
+    # | | | |
+    # -------
+    describe '2 ships of length 2, hits:[(1,1), (1,3)], sink_pair: [sink_point(1,2), length:2]' do
+      it 'should give [[0,0,0],[4,0,4],[0,0,0]]' do
+
+        ship_1 = Battleship::Ship.new(length: 2)
+        ship_2 = Battleship::Ship.new(length: 2)
+        hit_1 = Battleship::Point.new(row: 1, col: 1)
+        hit_2 = Battleship::Point.new(row: 1, col: 3)
+        sink_point = Battleship::Point.new(row: 1, col: 2)
+        ships = [ship_1, ship_2]
+        hits = [hit_1, hit_2]
+        sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                             ship_length: 2)
+        sink_pairs = [sink_pair]
+        tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                           hits: hits,
+                                                           sink_pairs: sink_pairs,
+                                                           row_length: 3,
+                                                           col_length: 3)
+
+        abs_freqs = tables_generator.abs_freqs
+        expect(abs_freqs).to eq [[0,0,0],[4,0,4],[0,0,0]]
+        expect(tables_generator.num_total_configurations).to eq 2
+      end
+    end
+  end
+  describe 'unambiguous positioning of sink ships' do
+    it 'all abs freqs should be 0' do
+
+      ship_1 = Battleship::Ship.new(length: 2)
+      hit_1 = Battleship::Point.new(row: 1, col: 1)
+      sink_point = Battleship::Point.new(row: 2, col: 1)
+      ships = [ship_1]
+      hits = [hit_1]
+      sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                           ship_length: 2)
+      sink_pairs = [sink_pair]
+      tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                         hits: hits,
+                                                         sink_pairs: sink_pairs,
+                                                         row_length: 3,
+                                                         col_length: 3)
+
+      abs_freqs = tables_generator.abs_freqs
+      expect(abs_freqs).to eq [[0,0,0],[0,0,0],[0,0,0]]
+      expect(tables_generator.num_total_configurations).to eq 1
+    end
+  end
+
   describe 'ship of length 2 in 3x3' do
     it 'abs_freqs should return the proper freqs' do
       ship_1 = Battleship::Ship.new(length: 2)
@@ -39,7 +96,7 @@ describe Battleship::TablesGenerator do
           ships = [ship_1]
           hits = [hit_1]
           sink_pair = Battleship::SinkPair.new(point: sink_point,
-                                                ship_length: 2)
+                                               ship_length: 2)
           sink_pairs = [sink_pair]
           tables_generator = Battleship::TablesGenerator.new(ships: ships,
                                                              hits: hits,
@@ -61,8 +118,8 @@ describe Battleship::TablesGenerator do
         ship_1 = Battleship::HorizontalShip.new(length: 2)
         ships = [ship_1]
         tables_generator = Battleship::TablesGenerator.new(ships: ships,
-                                                          row_length: 3,
-                                                          col_length: 3)
+                                                           row_length: 3,
+                                                           col_length: 3)
 
         expect(tables_generator.ships_combinations.first).to eq ship_1
       end
@@ -73,8 +130,8 @@ describe Battleship::TablesGenerator do
         ship_1 = Battleship::Ship.new(length: 2)
         ships = [ship_1]
         tables_generator = Battleship::TablesGenerator.new(ships: ships,
-                                                          row_length: 2,
-                                                          col_length: 2)
+                                                           row_length: 2,
+                                                           col_length: 2)
 
         first_combination = tables_generator.ships_combinations.first
         second_combination = tables_generator.ships_combinations[1]
@@ -93,8 +150,8 @@ describe Battleship::TablesGenerator do
         ship_2 = Battleship::Ship.new(length: 3)
         ships = [ship_1, ship_2]
         tables_generator = Battleship::TablesGenerator.new(ships: ships,
-                                                          row_length: 3,
-                                                          col_length: 3)
+                                                           row_length: 3,
+                                                           col_length: 3)
 
         combinations = tables_generator.ships_combinations
         first_combination = combinations.first

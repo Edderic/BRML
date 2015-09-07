@@ -33,7 +33,7 @@ module Battleship
     def occupies_valid_points?
       fully_onboard? &&
         !occupies_a_missed_point? &&
-        !occupies_a_sunk_point? &&
+        # !occupies_a_sunk_point? &&
         occupied_points_unique?
     end
 
@@ -45,12 +45,14 @@ module Battleship
       occupied_points.any? {|point| point.missed? }
     end
 
-    def abs_freq!
+    def abs_freq!(&block)
       return unless self.occupies_valid_points?
 
       occupied_points.each do |point|
-        point.abs_freq += 1 unless point.hit?
+        point.abs_freq += 1 unless point.sunk? || point.hit?
       end
+
+      yield block if block_given?
     end
 
     def unsunk?

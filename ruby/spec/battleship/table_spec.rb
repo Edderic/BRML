@@ -18,11 +18,11 @@ describe Battleship::Table do
                                      sink_pairs: sink_pairs,
                                      row_length: 3,
                                      col_length: 3)
-      expect(table.to_s).to eq "(1,1 | h) (1,2 | u) (1,3 | h)\n" +
-                               "(2,1 | u) (2,2 | u) (2,3 | u)\n" +
-                               "(3,1 | u) (3,2 | u) (3,3 | u)\n" +
-                               "sunk: false: (1,1 | h), (1,2 | u)\n" +
-                               "sunk: false: (1,1 | h), (1,2 | u)\n"
+      expect(table.to_s).to eq "(1,1 | h | 0) (1,2 | u | 0) (1,3 | h | 0)\n" +
+                               "(2,1 | u | 0) (2,2 | u | 0) (2,3 | u | 0)\n" +
+                               "(3,1 | u | 0) (3,2 | u | 0) (3,3 | u | 0)\n" +
+                               "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n" +
+                               "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n"
     end
   end
 
@@ -55,7 +55,7 @@ describe Battleship::Table do
 
 
       describe '1 horizontal, 1 vertical ship of length 2, hits:[(1,1), (1,3)], then sink_pair: [sink_point(1,2), length:2]' do
-        it 'should give [[0,0,0],[0,0,0],[0,0,0]]' do
+        it 'should give [[2,2,2],[1,0,1],[0,0,0]]' do
           ship_1 = Battleship::HorizontalShip.new(length: 2)
           ship_2 = Battleship::VerticalShip.new(length: 2)
           hit_1 = Battleship::Point.new(row: 1, col: 1)
@@ -71,11 +71,11 @@ describe Battleship::Table do
                                         sink_pairs: sink_pairs,
                                         row_length: 3,
                                         col_length: 3)
+          table.sink!(sink_point, 2)
           table.abs_freq!
 
           abs_freqs = table.abs_freqs
-          expect(abs_freqs).to eq [[2,2,2],[1,0,1],[0,0,0]]
-          # expect(tables_generator.num_total_configurations).to eq 2
+          expect(abs_freqs).to eq [[0,0,0],[1,0,1],[0,0,0]]
         end
       end
     end
@@ -103,30 +103,6 @@ describe Battleship::Table do
           expect(table.num_times_matching_sink_pair).to eq 1
         end
       end
-
-      describe 'when there is more than one way' do
-        it 'should return more than 1' do
-          ship = Battleship::HorizontalShip.new(length: 2)
-          ships = [ship]
-          misses = []
-          hit_1 = Battleship::Point.new(row: 1, col: 1, status: :hit)
-          sink_point = Battleship::Point.new(row: 1, col: 2)
-          hit_2 = Battleship::Point.new(row: 1, col: 3)
-
-          hits = [hit_1, hit_2]
-
-          sink_pair = Battleship::SinkPair.new(point: sink_point, ship_length: 2)
-          hash = {row_length: 1,
-                  col_length: 3,
-                  ships: ships,
-                  misses: misses,
-                  sink_pairs: [sink_pair],
-                  hits: hits}
-          table = Battleship::Table.new(hash)
-
-          expect(table.num_times_matching_sink_pair).to eq 2
-        end
-      end
     end
   end
 
@@ -138,9 +114,17 @@ describe Battleship::Table do
         misses = []
         hit_1 = Battleship::Point.new(row: 1, col: 1, status: :hit)
         hit_2 = Battleship::Point.new(row: 1, col: 2)
+        sink_pair = Battleship::SinkPair.new(point: hit_2,
+                                            ship_length: 2)
+        sink_pairs = [sink_pair]
 
         hits = [hit_1]
-        hash = {row_length: 1, col_length: 3, ships: ships, misses: misses, hits: hits}
+        hash = {row_length: 1,
+                col_length: 3,
+                ships: ships,
+                misses: misses,
+                sink_pairs: sink_pairs,
+                hits: hits}
         table = Battleship::Table.new(hash)
 
         table.sink!(hit_2, 2)
@@ -267,16 +251,24 @@ describe Battleship::Table do
             describe 'user hits (1,7) and sinks ship of length 2' do
               it 'gives us the proper absolute frequencies' do
                 hit_1_6 = Battleship::Point.new(row: 1, col: 6, state: :hit)
-                hit_1_7 = Battleship::Point.new(row: 1, col: 7, state: :hit)
+                hit_1_7 = Battleship::Point.new(row: 1, col: 7)
 
                 hits = [hit_1_6]
                 ship_length_2 = Battleship::HorizontalShip.new(length: 2)
                 ship_length_3 = Battleship::HorizontalShip.new(length: 3)
                 ships = [ship_length_2, ship_length_3]
-                hash = {col_length: 10, row_length: 1, ships: ships, hits: hits}
+                sink_pair = Battleship::SinkPair.new(ship_length:2,
+                                                    point: hit_1_7)
+                sink_pairs = [sink_pair]
+                hash = {col_length: 10,
+                        row_length: 1,
+                        ships: ships,
+                        sink_pairs: sink_pairs,
+                        hits: hits}
 
                 table = Battleship::Table.new(hash)
                 table.sink!(hit_1_7, 2)
+                # require 'pry'; binding.pry
                 table.abs_freq!
 
                 first_row_abs_freqs = table.abs_freqs.first
@@ -293,18 +285,23 @@ describe Battleship::Table do
     describe 'when there are unsunk ships' do
       it 'returns the unsunk ships' do
         ship_1 = Battleship::HorizontalShip.new(length: 2)
-        ship_2 = Battleship::HorizontalShip.new(length: 1)
+        ship_2 = Battleship::HorizontalShip.new(length: 3)
         ships = [ship_1, ship_2]
         misses = []
         hit_1 = Battleship::Point.new(row: 1, col: 1, status: :hit)
         hit_2 = Battleship::Point.new(row: 1, col: 2)
+        sink_pair = Battleship::SinkPair.new(point: hit_2, ship_length: 2)
 
         hits = [hit_1]
-        hash = {row_length: 1, col_length: 5, ships: ships, misses: misses, hits: hits}
+        hash = {row_length: 1,
+                col_length: 5,
+                sink_pairs: [sink_pair],
+                ships: ships,
+                misses: misses,
+                hits: hits}
         table = Battleship::Table.new(hash)
 
         table.sink!(hit_2, 2)
-
         expect( table.unsunk_ships.length).to eq 1
         expect( table.unsunk_ships[0].length).to eq ship_2.length
       end

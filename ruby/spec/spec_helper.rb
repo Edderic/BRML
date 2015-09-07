@@ -17,8 +17,8 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-require_relative '../lib/battleship_ship'
-Dir["lib/*.rb"].each {|file| require_relative  "../#{file}" }
+require_relative '../lib/battleship/ship'
+Dir["lib/**/*.rb"].each {|file| require_relative  "../#{file}" }
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

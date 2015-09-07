@@ -1,6 +1,9 @@
 # Battleship::Table is designed to only take ships with specified orientation.
 # This means that ships must be either a Battleship::HorizontalShip, or a
 # Battleship::VerticalShip.
+#
+# To sink something, the sink pairs must passed in the initialize,
+# and then it needs to be called after the initialize
 
 module Battleship
   class Table
@@ -38,29 +41,37 @@ module Battleship
         return 0
       end
 
-      count = 0
-
+      # TODO: consider cases when there are more than one sink pairs to sink
       sink_pair = sink_pairs.first
       sink_ship_length = sink_pair.sink_ship_length
       sink_point = sink_pair.sink_point
-      unsunk_ships_of_specified_length(sink_ship_length).each do |unsunk_ship|
-        each do |point|
-          unsunk_ship.start_at(point)
-          count += 1 if unsunk_ship.sinkable?(sink_point)
+
+      count = 0
+
+      calculate_across_all_points!(unsunk_ships, 0) do
+        unsunk_ships.each do |ship|
+          count+= 1 if ship.sinkable?(sink_point) && ship.length == sink_ship_length
         end
       end
 
       count
+      # TODO: out of all the possible matches,
     end
 
     def sink!(sink_point, length)
-      # need to make sure that at least one unsunken ship is able to have
-      # all its points covered
+      # maybe this should be renamed to ambiguous sink?
+      if ambiguous_sink_pair?
+        point_at(sink_point).sink!
+        return
+      end
 
-      unsunk_ships_of_specified_length(length).each do |unsunk_ship|
-        each do |point|
-          unsunk_ship.start_at(point)
-          unsunk_ship.sink!(sink_point)
+      # require 'pry'; binding.pry
+      calculate_across_all_points!(unsunk_ships, 0) do
+        unsunk_ships.each do |unsunk_ship|
+          # require 'pry'; binding.pry
+          if unsunk_ship.length == length
+            unsunk_ship.sink!(sink_point)
+          end
         end
       end
     end
@@ -106,6 +117,7 @@ module Battleship
       @misses.each {|miss| point_at(miss).miss!; miss.table = self}
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
+      @sink_pairs.each { |sp| sp.table = self}
       # @sink_pairs.each { |sp| sink!(sp[:sink_point], sp[:ship_length]) }
       @num_total_configurations = 0
     end
@@ -123,9 +135,15 @@ module Battleship
     end
 
     def abs_freq!
-      recreate!
-
-      calc_abs_freq!(unsunk_ships, 0)
+      calculate_across_all_points!(unsunk_ships, 0) do
+        unsunk_ships.each do |ship|
+          # puts "\n"
+          # puts "After the abs_freq!"
+          # puts to_s
+          # puts "\n"
+          ship.abs_freq! { @num_total_configurations += 1 }
+        end
+      end
     end
 
     def point_at(*args)
@@ -139,20 +157,26 @@ module Battleship
       end
     end
 
-
-    private
-
-    def calc_abs_freq!(available_ships, index)
+    def calculate_across_all_points!(available_ships, index, &block)
       return if index >= available_ships.length
 
       available_ship = available_ships[index]
       each do |point|
         available_ship.start_at(point)
-        calc_abs_freq!(available_ships, index + 1)
+        calculate_across_all_points!(available_ships, index + 1, &block)
 
-        unsunk_ships.each {|ship| ship.abs_freq!; @num_total_configurations += 1 } if valid?
+        if valid?
+          yield
+        end
       end
     end
+
+    private
+
+    def ambiguous_sink_pair?
+      num_times_matching_sink_pair != 1
+    end
+
 
     def valid?
       unsunk_ships.all? {|ship| ship.occupies_valid_points?} &&

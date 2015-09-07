@@ -73,15 +73,17 @@ module Battleship
     def filtered_tables
       if num_times_matching_sink_pair == 1
         tables.select {|table| table.num_times_matching_sink_pair == 1}
-      elsif num_times_matching_sink_pair == 0 && !sink_pairs.empty?
+      elsif num_times_matching_sink_pair == 0 && sink_pairs.empty?
         null_table = Battleship::Table.new(row_length: row_length,
                                     col_length: col_length,
                                    ships: [])
         def null_table.num_total_configurations
           0
         end
+        # require 'pry'; binding.pry
         [null_table]
       else
+        # require 'pry'; binding.pry
         tables
       end
     end

@@ -19,7 +19,7 @@ describe Battleship::Ship do
                                     ships: [ship_1])
       ship_1.start_at(starting_point)
       ship_1.sink!(starting_point)
-      expect(ship_1.to_s).to eq "sunk: true: (3,4)"
+      expect(ship_1.to_s).to eq "sunk: true: (3,4 | s | 0)"
     end
   end
 
