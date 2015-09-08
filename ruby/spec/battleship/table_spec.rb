@@ -210,6 +210,48 @@ describe Battleship::Table do
           first_row_abs_freqs = table.abs_freqs.first
           expect(first_row_abs_freqs).to eq [6,6,6,6,6,6]
         end
+
+        # |a|a|a|b|b| |
+        # | | |h|S|h| |
+        # |1|1|0|0|0| |
+        #
+        describe 'sink point has two hit points next to it' do
+          describe 'but the sinking is not ambiguous' do
+            it 'should give [1,1,0,0,0,0]' do
+              misses = []
+              hit_1_3 = Battleship::Point.new(row: 1, col: 3)
+              hit_1_5 = Battleship::Point.new(row: 1, col: 5)
+              sink_1_4 = Battleship::Point.new(row: 1, col: 4)
+              sink_pair = Battleship::SinkPair.new(point: sink_1_4,
+                                                   ship_length: 2)
+
+              hits = [hit_1_3, hit_1_5]
+              sink_pairs = [sink_pair]
+
+              ship_length_2 = Battleship::HorizontalShip.new(length: 2)
+              ship_length_3 = Battleship::HorizontalShip.new(length: 3)
+
+              ships = [ship_length_2, ship_length_3]
+              hash = {col_length: 6,
+                      row_length: 1,
+                      ships: ships,
+                      misses: misses,
+                      hits: hits,
+                      sink_pairs: sink_pairs
+                      }
+
+              table = Battleship::Table.new(hash)
+              table.sink!(sink_1_4, 2)
+
+              puts table.to_s
+              table.abs_freq!
+
+              first_row_abs_freqs = table.abs_freqs.first
+
+              expect(first_row_abs_freqs).to eq [1,1,0,0,0,0]
+            end
+          end
+        end
       end
     end
 
@@ -309,9 +351,10 @@ describe Battleship::Table do
           end
         end
       end
+
       describe '3-length ship is on (1,1), (1,2), and (1,3)' do
         describe '2-length ship is on (1,6) and (1,7)' do
-          it 'instantly has [1,2,3,3,3,3,3,3,2,1] of absolute frequencies' do
+          it 'instantly has [12, 22, 25, 23, 23, 23, 23, 25, 22, 12] of absolute frequencies' do
             misses = []
             ship_length_2 = Battleship::HorizontalShip.new(length: 2)
             ship_length_3 = Battleship::HorizontalShip.new(length: 3)
@@ -363,7 +406,6 @@ describe Battleship::Table do
 
                 table = Battleship::Table.new(hash)
                 table.sink!(hit_1_7, 2)
-                # require 'pry'; binding.pry
                 table.abs_freq!
 
                 first_row_abs_freqs = table.abs_freqs.first

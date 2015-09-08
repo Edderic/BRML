@@ -41,34 +41,21 @@ module Battleship
         return 0
       end
 
+
       # TODO: consider cases when there are more than one sink pairs to sink
       sink_pair = sink_pairs.first
-      sink_ship_length = sink_pair.sink_ship_length
-      sink_point = sink_pair.sink_point
 
-      count = 0
-
-      calculate_across_all_points!(unsunk_ships, 0) do
-        unsunk_ships.each do |ship|
-          count+= 1 if ship.sinkable?(sink_point) && ship.length == sink_ship_length
-        end
-      end
-
-      count
-      # TODO: out of all the possible matches,
+      sink_pair.num_times_matching_sink_pair
     end
 
     def sink!(sink_point, length)
-      # maybe this should be renamed to ambiguous sink?
       if ambiguous_sink_pair?
         point_at(sink_point).sink!
         return
       end
 
-      # require 'pry'; binding.pry
       calculate_across_all_points!(unsunk_ships, 0) do
         unsunk_ships.each do |unsunk_ship|
-          # require 'pry'; binding.pry
           if unsunk_ship.length == length
             unsunk_ship.sink!(sink_point)
           end
