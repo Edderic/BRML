@@ -130,6 +130,7 @@ describe Battleship::TablesGenerator do
               abs_freqs = tables_generator.abs_freqs
 
               expect(abs_freqs).to eq [[0,0,0], [2,0,0], [0,2,0]]
+              expect(tables_generator.num_total_configurations).to eq 4
             end
 
             describe 'misses at (3,2)' do
