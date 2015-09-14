@@ -72,9 +72,6 @@ describe Battleship::TablesGenerator do
           # sink_point = Battleship::Point.new(row: 1, col: 2)
           ships = [ship_1, ship_2]
           hits = [hit_1, hit_2]
-          # sink_pair = Battleship::SinkPair.new(point: sink_point,
-          # ship_length: 2)
-          # sink_pairs = [sink_pair]
           tables_generator = Battleship::TablesGenerator.new(ships: ships,
                                                              hits: hits,
                                                              sink_pairs: [],
