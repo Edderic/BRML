@@ -111,6 +111,32 @@ describe Battleship::TablesGenerator do
       expect(tables_generator.num_total_configurations).to eq 4
     end
   end
+
+  describe 'sink length 2 at (1,3)' do
+    it 'should give [[0,0,0],[0,0,0],[0,0,0]]' do
+      ship_1 = Battleship::Ship.new(length: 2)
+      ship_2 = Battleship::Ship.new(length: 2)
+      hit_1 = Battleship::Point.new(row: 1, col: 1)
+      hit_2 = Battleship::Point.new(row: 1, col: 3)
+      sink_point_1 = Battleship::Point.new(row: 1, col: 2)
+      sink_point_2 = Battleship::Point.new(row: 3, col: 2)
+      ships = [ship_1, ship_2]
+      hits = [hit_1, hit_2]
+      sink_pair_1 = Battleship::SinkPair.new(point: sink_point_1,
+                                           ship_length: 2)
+      sink_pair_2 = Battleship::SinkPair.new(point: sink_point_2,
+                                           ship_length: 2)
+      sink_pairs = [sink_pair_1, sink_pair_2]
+      tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                         hits: hits,
+                                                         sink_pairs: sink_pairs,
+                                                         row_length: 3,
+                                                         col_length: 3)
+      abs_freqs = tables_generator.abs_freqs
+
+      expect(abs_freqs).to eq [[0,0,0],[0,0,0],[0,0,0]]
+    end
+  end
 end
 
 describe 'unambiguous positioning of sink ships' do
@@ -129,7 +155,6 @@ describe 'unambiguous positioning of sink ships' do
                                                        row_length: 3,
                                                        col_length: 3)
 
-    # require 'pry'; binding.pry
     abs_freqs = tables_generator.abs_freqs
     expect(abs_freqs).to eq [[0,0,0],[0,0,0],[0,0,0]]
     expect(tables_generator.num_total_configurations).to eq 0
