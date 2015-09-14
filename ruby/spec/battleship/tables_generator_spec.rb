@@ -83,6 +83,7 @@ describe Battleship::TablesGenerator do
           abs_freqs = tables_generator.abs_freqs
 
           expect(abs_freqs).to eq [[0,8,0], [8,0,4], [0,4,0]]
+          expect(tables_generator.num_total_configurations).to eq 12
         end
 
         describe 'sink length 2 at (1,2)' do
@@ -105,6 +106,7 @@ describe Battleship::TablesGenerator do
             abs_freqs = tables_generator.abs_freqs
 
             expect(abs_freqs).to eq [[0,0,0], [2,0,1], [0,2,0]]
+            expect(tables_generator.num_total_configurations).to eq 5
           end
 
           describe 'misses at (2,3)' do
