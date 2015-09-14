@@ -13,16 +13,12 @@ module Battleship
       @row_length = hash.fetch(:row_length)
       @col_length = hash.fetch(:col_length)
 
-      @sink_pairs.each {|sunk_pair| sunk_pair.tables_generator = self}
+      @sink_pairs.each {|sink_pair| sink_pair.tables_generator = self}
       @tables = reinitialize_tables
     end
 
     def ships_combinations
-      if ships.all? {|ship| ship.class == Battleship::Ship}
-        combine(0, [], [])
-      else
-        @ships
-      end
+      combine(0, [], [])
     end
 
     def num_times_matching_sink_pair
@@ -34,56 +30,59 @@ module Battleship
     def reinitialize_tables
       ships_combinations.map do |ships_combo|
         table = Battleship::Table.new(row_length: row_length,
-                              col_length: col_length,
-                              ships: Array(ships_combo),
-                              sink_pairs: sink_pairs,
-                              misses: misses,
-                              hits: hits)
-        table.recreate!
+                                      col_length: col_length,
+                                      ships: Array(ships_combo),
+                                      sink_pairs: cloned_sink_pairs,
+                                      misses: misses,
+                                      hits: hits)
         table
       end
     end
 
     def abs_freqs
-      filtered_tables.each do |table|
-        sink_pairs.each do |sink_pair|
-          table.sink!(sink_pair.sink_point, sink_pair.sink_ship_length)
+      @tables.each do |table|
+        table.sink_pairs.each do |sink_pair|
+          sink_pair.sink!
         end
       end
 
-      @tables.each {|table| table.abs_freq!}
+      count = 0
+      @tables.each do |table|
+        table.abs_freq!
+      end
       reshape(sum_one_dim(points_in_one_dim {|point| point.abs_freq}))
     end
 
     def num_total_configurations
-      tables.inject(0) {|count, table| count = count + table.num_total_configurations}
+      tables.inject(0) do |count, table|
+        count = count + table.num_total_configurations
+      end
     end
 
     private
 
     # converts rows into one row
     def points_in_one_dim(&block)
-      filtered_tables.map do |table|
+      @tables.map do |table|
         table.map do |point|
           yield point
         end
       end
     end
 
+    # TODO: what is the purpose of this?
     def filtered_tables
       if num_times_matching_sink_pair == 1
         tables.select {|table| table.num_times_matching_sink_pair == 1}
       elsif num_times_matching_sink_pair == 0 && sink_pairs.empty?
         null_table = Battleship::Table.new(row_length: row_length,
-                                    col_length: col_length,
-                                   ships: [])
+                                           col_length: col_length,
+                                           ships: [])
         def null_table.num_total_configurations
           0
         end
-        # require 'pry'; binding.pry
         [null_table]
       else
-        # require 'pry'; binding.pry
         tables
       end
     end
@@ -114,19 +113,20 @@ module Battleship
         return combinations
       end
 
-      ship = @ships[ship_index]
-
       combine(ship_index + 1, combinations, ship(ship_index, :to_horizontal, combination))
       combine(ship_index + 1, combinations, ship(ship_index, :to_vertical, combination))
       combinations
     end
 
     def ship(ship_index, orientation, combination)
-      ship = @ships[ship_index]
-      if ship.send(orientation).class == Battleship::NullShip
-        combination.clone
-      else
-        combination.clone << ship.send(orientation)
+      ship = @ships[ship_index].clone
+      new_combo = combination.clone << ship.send(orientation)
+      new_combo.map {|a_ship| a_ship.clone}
+    end
+
+    def cloned_sink_pairs
+      @sink_pairs.map do |sink_pair|
+        sink_pair.clone
       end
     end
   end

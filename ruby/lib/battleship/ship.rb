@@ -12,6 +12,18 @@ module Battleship
       @sunk = hash.fetch(:sunk) { false }
     end
 
+    def fully_sunk?
+      sunk? && occupied_points.all? {|point| point.sunk?}
+    end
+
+    def sunk_at?(sink_point)
+      table.point_at(sink_point).sunk? && occupied_points.reject do |pt|
+        pt.same_as?(sink_point)
+      end.all? do |occupied_points_but_not_sink_point|
+        occupied_points_but_not_sink_point.hit?
+      end
+    end
+
     def to_s
       occupied_points.inject("sunk: #{sunk?}:") {|accum, point| "#{accum} #{point},"}[0...-1]
     end
@@ -59,6 +71,10 @@ module Battleship
       !sunk?
     end
 
+    def ambiguous_sunk?
+      false
+    end
+
     def sinkable?(sink_point)
       occupied_points.select {|point| point.sunk? || point.hit? }.count >= occupied_points.length - 1 &&
         @table.point_at(sink_point).untried? &&
@@ -77,6 +93,10 @@ module Battleship
       end
     end
 
+    def start_at?(point)
+      starting_point.same_as?(point)
+    end
+
     def sunk?
       @sunk
     end
@@ -93,8 +113,6 @@ module Battleship
                                      starting_point: @starting_point,
                                      table: @table)
     end
-
-    private
 
     def occupied_points_unique?
       all_occupied_points = @table.ships.map {|ship| ship.occupied_points }.flatten

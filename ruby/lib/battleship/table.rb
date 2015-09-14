@@ -15,7 +15,8 @@ module Battleship
       :ships,
       :hits,
       :num_total_configurations,
-      :sink_pairs
+      :sink_pairs,
+      :fully_sunk_ships
 
     def initialize(hash)
       @row_length = hash.fetch(:row_length)
@@ -24,8 +25,16 @@ module Battleship
       @misses = hash.fetch(:misses) { [] }
       @sink_pairs = hash.fetch(:sink_pairs) { [] }
       @hits = hash.fetch(:hits) { [] }
-      # abs_freq!
+      @fully_sunk_ships = []
       recreate!
+    end
+
+    def sunk_ships
+      @ships.select {|ship| ship.sunk? }
+    end
+
+    def add_fully_sunk_ship!(ship)
+      @fully_sunk_ships << Battleship::FullySunkShip.new(ship)
     end
 
     def to_s
@@ -41,26 +50,14 @@ module Battleship
         return 0
       end
 
-
       # TODO: consider cases when there are more than one sink pairs to sink
       sink_pair = sink_pairs.first
 
       sink_pair.num_times_matching_sink_pair
     end
 
-    def sink!(sink_point, length)
-      if ambiguous_sink_pair?
-        point_at(sink_point).sink!
-        return
-      end
-
-      calculate_across_all_points!(unsunk_ships, 0) do
-        unsunk_ships.each do |unsunk_ship|
-          if unsunk_ship.length == length
-            unsunk_ship.sink!(sink_point)
-          end
-        end
-      end
+    def sink!(sink_pair)
+      sink_pair.sink!
     end
 
     def rel_freqs
@@ -105,7 +102,6 @@ module Battleship
       @hits.each {|hit| point_at(hit).hit!; hit.table = self}
       @ships.each {|ship| ship.table = self}
       @sink_pairs.each { |sp| sp.table = self}
-      # @sink_pairs.each { |sp| sink!(sp[:sink_point], sp[:ship_length]) }
       @num_total_configurations = 0
     end
 
@@ -124,12 +120,32 @@ module Battleship
     def abs_freq!
       calculate_across_all_points!(unsunk_ships, 0) do
         unsunk_ships.each do |ship|
-          # puts "\n"
-          # puts "After the abs_freq!"
-          # puts to_s
-          # puts "\n"
-          ship.abs_freq! { @num_total_configurations += 1 }
+          debug("ship.abs_freq!") do
+            ship.abs_freq! { @num_total_configurations += 1 / ships.count.to_f }
+          end
         end
+      end
+    end
+
+    def debug?
+      # true
+    end
+
+    def debug(comment, &block)
+      if debug?
+        puts "\n"
+        puts "Before the #{comment}"
+        puts to_s
+        puts "\n"
+      end
+
+      yield block
+
+      if debug?
+        puts "\n"
+        puts "After the #{comment}"
+        puts to_s
+        puts "\n"
       end
     end
 
@@ -158,16 +174,18 @@ module Battleship
       end
     end
 
-    private
-
-    def ambiguous_sink_pair?
-      num_times_matching_sink_pair != 1
+    def ships_to_be_fully_sunk
+      ships.select do |ship|
+        ship.unsunk? || ship.ambiguous_sunk?
+      end
     end
 
+    private
 
     def valid?
       unsunk_ships.all? {|ship| ship.occupies_valid_points?} &&
-        @hits.all? { |hit| hit.table = self; hit.on_an_unsunk_ship?  }
+        @hits.all? { |hit| hit.table = self; hit.on_an_unsunk_ship?  } &&
+        @sink_pairs.all? {|sink_pair| sink_pair.valid?  }
     end
 
     def point(args)

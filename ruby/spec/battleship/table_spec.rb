@@ -1,6 +1,78 @@
 require 'spec_helper'
 
 describe Battleship::Table do
+  describe '#fully_sunk_ships' do
+    it 'should return ships that have all of its occupied points sunk' do
+      ship_1 = Battleship::HorizontalShip.new(length: 2)
+      ship_2 = Battleship::HorizontalShip.new(length: 3)
+      hit_1 = Battleship::Point.new(row: 1, col: 1)
+      sink_point = Battleship::Point.new(row: 1, col: 2)
+      ships = [ship_1, ship_2]
+      hits = [hit_1]
+      sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                           ship_length: 2)
+      sink_pairs = [sink_pair]
+      table = Battleship::Table.new(ships: ships,
+                                    hits: hits,
+                                    sink_pairs: sink_pairs,
+                                    row_length: 3,
+                                    col_length: 3)
+      sink_pair.sink!
+
+      fully_sunk_ship = table.fully_sunk_ships[0]
+      expect(fully_sunk_ship.starting_point.same_as?(hit_1)).to eq true
+      expect(table.fully_sunk_ships.count).to eq 1
+    end
+  end
+
+  describe '#ships_to_be_fully_sunk' do
+    it 'should give us the unsunk ships and ships that are sunk but ambiguous' do
+      ship_1 = Battleship::HorizontalShip.new(length: 2)
+      ship_2 = Battleship::HorizontalShip.new(length: 3)
+      hit_1 = Battleship::Point.new(row: 1, col: 1)
+      hit_2 = Battleship::Point.new(row: 1, col: 3)
+      sink_point = Battleship::Point.new(row: 1, col: 2)
+      ships = [ship_1, ship_2]
+      hits = [hit_1, hit_2]
+      sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                           ship_length: 2)
+      sink_pairs = [sink_pair]
+      table = Battleship::Table.new(ships: ships,
+                                    hits: hits,
+                                    sink_pairs: sink_pairs,
+                                    row_length: 3,
+                                    col_length: 3)
+      expect(table.ships_to_be_fully_sunk[0]).to eq ship_1
+      expect(table.ships_to_be_fully_sunk[1]).to eq ship_2
+
+      sink_pair.sink!
+
+      expect(table.ships_to_be_fully_sunk[0]).to eq ship_1
+      expect(table.ships_to_be_fully_sunk[1]).to eq ship_2
+    end
+
+    it 'should not include sunk ships that are unambiguous' do
+      ship_1 = Battleship::HorizontalShip.new(length: 2)
+      ship_2 = Battleship::HorizontalShip.new(length: 3)
+      hit_1 = Battleship::Point.new(row: 1, col: 1)
+      sink_point = Battleship::Point.new(row: 1, col: 2)
+      ships = [ship_1, ship_2]
+      hits = [hit_1]
+      sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                           ship_length: 2)
+      sink_pairs = [sink_pair]
+      table = Battleship::Table.new(ships: ships,
+                                    hits: hits,
+                                    sink_pairs: sink_pairs,
+                                    row_length: 3,
+                                    col_length: 3)
+      sink_pair.sink!
+
+      expect(table.ships_to_be_fully_sunk[0]).to eq ship_2
+      expect(table.ships_to_be_fully_sunk.length).to eq 1
+    end
+  end
+
   describe '#to_s' do
     it 'should print the 2D arrangement of  points' do
       ship_1 = Battleship::HorizontalShip.new(length: 2)
@@ -14,15 +86,15 @@ describe Battleship::Table do
                                            ship_length: 2)
       sink_pairs = [sink_pair]
       table = Battleship::Table.new(ships: ships,
-                                     hits: hits,
-                                     sink_pairs: sink_pairs,
-                                     row_length: 3,
-                                     col_length: 3)
+                                    hits: hits,
+                                    sink_pairs: sink_pairs,
+                                    row_length: 3,
+                                    col_length: 3)
       expect(table.to_s).to eq "(1,1 | h | 0) (1,2 | u | 0) (1,3 | h | 0)\n" +
-                               "(2,1 | u | 0) (2,2 | u | 0) (2,3 | u | 0)\n" +
-                               "(3,1 | u | 0) (3,2 | u | 0) (3,3 | u | 0)\n" +
-                               "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n" +
-                               "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n"
+        "(2,1 | u | 0) (2,2 | u | 0) (2,3 | u | 0)\n" +
+        "(3,1 | u | 0) (3,2 | u | 0) (3,3 | u | 0)\n" +
+        "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n" +
+        "sunk: false: (1,1 | h | 0), (1,2 | u | 0)\n"
     end
   end
 
@@ -41,21 +113,25 @@ describe Battleship::Table do
           sink_pair = Battleship::SinkPair.new(point: sink_point,
                                                ship_length: 2)
           sink_pairs = [sink_pair]
-          tables = Battleship::Table.new(ships: ships,
+          table = Battleship::Table.new(ships: ships,
                                          hits: hits,
                                          sink_pairs: sink_pairs,
                                          row_length: 3,
                                          col_length: 3)
 
-          abs_freqs = tables.abs_freqs
+          abs_freqs = table.abs_freqs
           expect(abs_freqs).to eq [[0,0,0],[0,0,0],[0,0,0]]
+
+          # hit(1,3) is unmatched
+          expect(ship_2).not_to be_sunk
+
           # expect(tables_generator.num_total_configurations).to eq 2
         end
       end
 
 
       describe '1 horizontal, 1 vertical ship of length 2, hits:[(1,1), (1,3)], then sink_pair: [sink_point(1,2), length:2]' do
-        it 'should give [[2,2,2],[1,0,1],[0,0,0]]' do
+        it 'should give [[0,0,0],[1,0,1],[0,0,0]]' do
           ship_1 = Battleship::HorizontalShip.new(length: 2)
           ship_2 = Battleship::VerticalShip.new(length: 2)
           hit_1 = Battleship::Point.new(row: 1, col: 1)
@@ -71,7 +147,7 @@ describe Battleship::Table do
                                         sink_pairs: sink_pairs,
                                         row_length: 3,
                                         col_length: 3)
-          table.sink!(sink_point, 2)
+          sink_pair.sink!
           table.abs_freq!
 
           abs_freqs = table.abs_freqs
@@ -127,7 +203,7 @@ describe Battleship::Table do
                 hits: hits}
         table = Battleship::Table.new(hash)
 
-        table.sink!(hit_2, 2)
+        sink_pair.sink!
 
         expect(table.point_at(hit_1)).to be_sunk
         expect(table.point_at(hit_2)).to be_sunk
@@ -238,12 +314,11 @@ describe Battleship::Table do
                       misses: misses,
                       hits: hits,
                       sink_pairs: sink_pairs
-                      }
+              }
 
               table = Battleship::Table.new(hash)
-              table.sink!(sink_1_4, 2)
+              sink_pair.sink!
 
-              puts table.to_s
               table.abs_freq!
 
               first_row_abs_freqs = table.abs_freqs.first
@@ -256,6 +331,61 @@ describe Battleship::Table do
     end
 
     describe '1x10 board' do
+      describe 'ship at (1,3), (1,4), (1,5) and ship at (1,6) and (1,7)' do
+        describe 'hits at (1,5) and (1,7) and sink at (1,6)' do
+          it 'should give us [0,0,1,1,0,0,0,1,1,0]' do
+            ship_1 = Battleship::HorizontalShip.new(length: 3)
+            ship_2 = Battleship::HorizontalShip.new(length: 2)
+            hit_1_5 = Battleship::Point.new(row: 1, col: 5)
+            hit_1_7 = Battleship::Point.new(row: 1, col: 7)
+            sink_1_6 = Battleship::Point.new(row: 1, col: 6)
+            sink_pair = Battleship::SinkPair.new(point: sink_1_6,
+                                                 ship_length: 2)
+            sink_pairs = [sink_pair]
+            ships = [ship_1, ship_2]
+            hits = [hit_1_5, hit_1_7]
+            table = Battleship::Table.new(col_length: 10,
+                                          row_length: 1,
+                                          ships: ships,
+                                          hits: hits,
+                                          sink_pairs: sink_pairs)
+            table.sink!(sink_pair)
+            table.abs_freq!
+
+            first_row_abs_freqs = table.abs_freqs.first
+            # expect(table.sunk_ships).to include(ship_2)
+            expect(first_row_abs_freqs).to eq [0,0,1,1,0,0,0,1,1,0]
+          end
+
+          describe 'user hits (1,4)' do
+            it 'abs freqs should be [0,0,1,0,0,0,0,0,0,0]' do
+              ship_1 = Battleship::HorizontalShip.new(length: 3)
+              ship_2 = Battleship::HorizontalShip.new(length: 2)
+              hit_1_4 = Battleship::Point.new(row: 1, col: 4)
+              hit_1_5 = Battleship::Point.new(row: 1, col: 5)
+              hit_1_7 = Battleship::Point.new(row: 1, col: 7)
+              sink_1_6 = Battleship::Point.new(row: 1, col: 6)
+              sink_pair = Battleship::SinkPair.new(point: sink_1_6,
+                                                   ship_length: 2)
+              sink_pairs = [sink_pair]
+              ships = [ship_1, ship_2]
+              hits = [hit_1_4, hit_1_5, hit_1_7]
+              table = Battleship::Table.new(col_length: 10,
+                                            row_length: 1,
+                                            ships: ships,
+                                            hits: hits,
+                                            sink_pairs: sink_pairs)
+              table.sink!(sink_pair)
+              table.abs_freq!
+
+              first_row_abs_freqs = table.abs_freqs.first
+              # expect(table.sunk_ships).to include(ship_2)
+              expect(first_row_abs_freqs).to eq [0,0,1,0,0,0,0,0,0,0]
+            end
+          end
+        end
+      end
+
       describe '5-length horizontal ship on (1,5) -> (1,10)' do
         it 'should give us [1,2,3,4,5,5,4,3,2,1]' do
           ship = Battleship::HorizontalShip.new(length: 5)
@@ -339,8 +469,8 @@ describe Battleship::Table do
                                               row_length: 1,
                                               ships: ships,
                                               hits: hits,
-                                             sink_pairs: sink_pairs)
-                table.sink!(sink_1_10, 5)
+                                              sink_pairs: sink_pairs)
+                sink_pair.sink!
 
                 table.abs_freq!
 
@@ -405,7 +535,7 @@ describe Battleship::Table do
                         hits: hits}
 
                 table = Battleship::Table.new(hash)
-                table.sink!(hit_1_7, 2)
+                sink_pair.sink!
                 table.abs_freq!
 
                 first_row_abs_freqs = table.abs_freqs.first
@@ -438,9 +568,95 @@ describe Battleship::Table do
                 hits: hits}
         table = Battleship::Table.new(hash)
 
-        table.sink!(hit_2, 2)
+        sink_pair.sink!
         expect( table.unsunk_ships.length).to eq 1
         expect( table.unsunk_ships[0].length).to eq ship_2.length
+      end
+    end
+  end
+
+  describe '2 ships' do
+    describe 'both horizontal' do
+      describe 'both length 2' do
+        describe 'hits at [(1,1),(2,2)]' do
+          it '#abs_freqs should give us [[0,4,0], [2,0,2], [0,0,0]]' do
+            ship_1 = Battleship::HorizontalShip.new(length: 2)
+            ship_2 = Battleship::HorizontalShip.new(length: 2)
+            ships = [ship_1, ship_2]
+            misses = []
+            hit_1 = Battleship::Point.new(row: 1, col: 1)
+            hit_2 = Battleship::Point.new(row: 2, col: 2)
+            # sink_pair = Battleship::SinkPair.new(point: hit_2, ship_length: 2)
+
+            hits = [hit_1, hit_2]
+            hash = {row_length: 3,
+                    col_length: 3,
+                    sink_pairs: [],
+                    ships: ships,
+                    misses: misses,
+                    hits: hits}
+            table = Battleship::Table.new(hash)
+            table.abs_freq!
+
+            expect( table.abs_freqs).to eq [[0,4,0], [2,0,2], [0,0,0]]
+          end
+        end
+      end
+    end
+
+    describe 'both vertical' do
+      describe 'both length 2' do
+        describe 'hits at [(1,1),(2,2)]' do
+          it '#abs_freqs should give us [[0,2,0], [4,0,0], [0,2,0]]' do
+            ship_1 = Battleship::VerticalShip.new(length: 2)
+            ship_2 = Battleship::VerticalShip.new(length: 2)
+            ships = [ship_1, ship_2]
+            misses = []
+            hit_1 = Battleship::Point.new(row: 1, col: 1)
+            hit_2 = Battleship::Point.new(row: 2, col: 2)
+            # sink_pair = Battleship::SinkPair.new(point: hit_2, ship_length: 2)
+
+            hits = [hit_1, hit_2]
+            hash = {row_length: 3,
+                    col_length: 3,
+                    sink_pairs: [],
+                    ships: ships,
+                    misses: misses,
+                    hits: hits}
+            table = Battleship::Table.new(hash)
+            table.abs_freq!
+
+            expect( table.abs_freqs).to eq [[0,2,0], [4,0,0], [0,2,0]]
+          end
+        end
+      end
+    end
+
+    describe 'one vertical, one horizontal' do
+      describe 'both length 2' do
+        describe 'hits at [(1,1),(2,2)]' do
+          it '#abs_freqs should give us [[0,3,0], [2,0,2], [0,0,0]]' do
+            ship_1 = Battleship::VerticalShip.new(length: 2)
+            ship_2 = Battleship::HorizontalShip.new(length: 2)
+            ships = [ship_1, ship_2]
+            misses = []
+            hit_1 = Battleship::Point.new(row: 1, col: 1)
+            hit_2 = Battleship::Point.new(row: 2, col: 2)
+            # sink_pair = Battleship::SinkPair.new(point: hit_2, ship_length: 2)
+
+            hits = [hit_1, hit_2]
+            hash = {row_length: 3,
+                    col_length: 3,
+                    sink_pairs: [],
+                    ships: ships,
+                    misses: misses,
+                    hits: hits}
+            table = Battleship::Table.new(hash)
+            table.abs_freq!
+
+            expect( table.abs_freqs).to eq [[0,1,0], [1,0,1], [0,1,0]]
+          end
+        end
       end
     end
   end
