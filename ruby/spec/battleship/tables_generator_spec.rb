@@ -106,6 +106,60 @@ describe Battleship::TablesGenerator do
 
             expect(abs_freqs).to eq [[0,0,0], [2,0,1], [0,2,0]]
           end
+
+          describe 'misses at (2,3)' do
+            it 'should give us [[0,0,0], [2,0,0], [0,2,0]]' do
+              ship_1 = Battleship::Ship.new(length: 2)
+              ship_2 = Battleship::Ship.new(length: 2)
+              hit_1 = Battleship::Point.new(row: 1, col: 1)
+              hit_2 = Battleship::Point.new(row: 2, col: 2)
+              miss_1 = Battleship::Point.new(row: 2, col: 3)
+              sink_point = Battleship::Point.new(row: 1, col: 2)
+              ships = [ship_1, ship_2]
+              hits = [hit_1, hit_2]
+              misses = [miss_1]
+              sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                                   ship_length: 2)
+              sink_pairs = [sink_pair]
+              tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                                 hits: hits,
+                                                                 misses: misses,
+                                                                 sink_pairs: sink_pairs,
+                                                                 row_length: 3,
+                                                                 col_length: 3)
+              abs_freqs = tables_generator.abs_freqs
+
+              expect(abs_freqs).to eq [[0,0,0], [2,0,0], [0,2,0]]
+            end
+
+            describe 'misses at (3,2)' do
+              it 'should give us [[0,0,0], [2,0,0], [0,0,0]]' do
+                ship_1 = Battleship::Ship.new(length: 2)
+                ship_2 = Battleship::Ship.new(length: 2)
+                hit_1 = Battleship::Point.new(row: 1, col: 1)
+                hit_2 = Battleship::Point.new(row: 2, col: 2)
+                miss_1 = Battleship::Point.new(row: 2, col: 3)
+                miss_2 = Battleship::Point.new(row: 3, col: 2)
+                sink_point = Battleship::Point.new(row: 1, col: 2)
+                ships = [ship_1, ship_2]
+                hits = [hit_1, hit_2]
+                misses = [miss_1, miss_2]
+                sink_pair = Battleship::SinkPair.new(point: sink_point,
+                                                     ship_length: 2)
+                sink_pairs = [sink_pair]
+                tables_generator = Battleship::TablesGenerator.new(ships: ships,
+                                                                   hits: hits,
+                                                                   misses: misses,
+                                                                   sink_pairs: sink_pairs,
+                                                                   row_length: 3,
+                                                                   col_length: 3)
+                abs_freqs = tables_generator.abs_freqs
+
+                expect(abs_freqs).to eq [[0,0,0], [2,0,0], [0,0,0]]
+                expect(tables_generator.num_total_configurations).to eq 2
+              end
+            end
+          end
         end
       end
     end

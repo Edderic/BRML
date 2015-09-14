@@ -121,7 +121,7 @@ module Battleship
       calculate_across_all_points!(unsunk_ships, 0) do
         unsunk_ships.each do |ship|
           debug("ship.abs_freq!") do
-            ship.abs_freq! { @num_total_configurations += 1 / ships.count.to_f }
+            ship.abs_freq! { @num_total_configurations += 1 / unsunk_ships.count.to_f }
           end
         end
       end
