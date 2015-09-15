@@ -7,7 +7,7 @@
 
 module Battleship
   class Table
-    @@count = 0
+    include Battleship::TableHelper
     include Enumerable
 
     attr_reader :row_length,
@@ -63,19 +63,11 @@ module Battleship
     def rel_freqs
       abs_freq!
 
-      abs_freqs.map do |row|
-        row.map do |abs_freq|
-          abs_freq / @num_total_configurations.to_f
-        end
-      end
+      super
     end
 
     def unsunk_ships
       @ships.select {|ship| ship.unsunk? }
-    end
-
-    def max_abs_freq
-      self.max {|point1, point2| point1.abs_freq <=> point2.abs_freq}.abs_freq
     end
 
     def abs_freqs
@@ -103,14 +95,6 @@ module Battleship
       @ships.each {|ship| ship.table = self}
       @sink_pairs.each { |sp| sp.table = self}
       @num_total_configurations = 0
-    end
-
-    def each(&block)
-      (1..row_length).each do |row|
-        (1..col_length).each do |col|
-          block.call(point_at([row,col]))
-        end
-      end
     end
 
     def sum_of_abs_freqs
@@ -149,17 +133,6 @@ module Battleship
       end
     end
 
-    def point_at(*args)
-      if point(args).off_table?
-        Battleship::Point.new(row: point(args).row,
-                              col: point(args).col,
-                              table: self
-                             )
-      else
-        @table[point(args).row - 1][point(args).col - 1]
-      end
-    end
-
     def calculate_across_all_points!(available_ships, index, &block)
       return if index >= available_ships.length
 
@@ -188,15 +161,6 @@ module Battleship
         @sink_pairs.all? {|sink_pair| sink_pair.valid?  }
     end
 
-    def point(args)
-      args.flatten!
-      if args.length == 1
-        args.first.table = self
-        args.first
-      else
-        Battleship::Point.new(row: args[0], col: args[1], table: self)
-      end
-    end
 
     def unsunk_ships_of_specified_length(length)
       unsunk_ships.select {|ship| ship.length == length}

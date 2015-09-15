@@ -104,6 +104,14 @@ describe Battleship::TablesGenerator do
 
             expect(abs_freqs).to eq [[0,0,0], [2,0,1], [0,2,0]]
             expect(tables_generator.num_total_configurations).to eq 5
+            expect(tables_generator.best_targets.count).to eq 2
+            expect(tables_generator.best_targets.any? do |pt|
+              pt.has_coords?(2,1)
+            end).to eq true
+
+            expect(tables_generator.best_targets.any? do |pt|
+              pt.has_coords?(3,2)
+            end).to eq true
           end
 
           describe 'misses at (2,3)' do

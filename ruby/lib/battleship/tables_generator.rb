@@ -17,6 +17,10 @@ module Battleship
       @tables = reinitialize_tables
     end
 
+    def best_targets
+      Battleship::ReducedTable.new(abs_freqs, num_total_configurations).best_targets
+    end
+
     def ships_combinations
       combine(0, [], [])
     end

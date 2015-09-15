@@ -18,6 +18,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require_relative '../lib/battleship/ship'
+require_relative '../lib/battleship/table_helper'
 Dir["lib/**/*.rb"].each {|file| require_relative  "../#{file}" }
 
 RSpec.configure do |config|
