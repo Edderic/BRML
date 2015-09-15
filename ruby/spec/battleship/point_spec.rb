@@ -1,6 +1,14 @@
 require 'spec_helper'
 
 describe Battleship::Point do
+  describe '#has_coords?(row,col)' do
+    it 'should return true if has coordinates' do
+      starting_point = Battleship::Point.new(row: 2, col: 2)
+      expect(starting_point.has_coords?(2,2)).to eq true
+      expect(starting_point.has_coords?(3,2)).to eq false
+    end
+  end
+
   describe '#neighboring_points' do
     it 'should return the neighboring points in the table' do
       ships = []

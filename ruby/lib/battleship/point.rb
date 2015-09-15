@@ -11,6 +11,10 @@ module Battleship
       @state = hash.fetch(:state) {:untried}
     end
 
+    def has_coords?(r,c)
+      row == r && col == c
+    end
+
     def neighboring_points
       [
         @table.point_at(row-1, col),
