@@ -14,8 +14,7 @@ class AdjacencyMatrix
     end
 
     def connected_components
-      components = []
-      @matrix.each_with_index do |row, row_index|
+      @matrix.each.with_index.inject([]) do |components, (row, row_index)|
         adj_nodes_of_row = adjacent_nodes_of_row(row)
         adj_nodes_of_row << row_index
 
@@ -27,9 +26,7 @@ class AdjacencyMatrix
           reject_duplicates(components, matches, adj_nodes_of_row)
           components << union_component(matches, adj_nodes_of_row)
         end
-      end
-
-      components.map { |component| component.sort! }
+      end.map { |component| component.sort! }
     end
 
     def reject_duplicates(components, matches, adj_nodes_of_row)
