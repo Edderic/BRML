@@ -26,3 +26,5 @@ dependencies:
   - jupyter-server-proxy=3.0.2
   - tornado=6.1.0
   - pytest-tornasync=0.6.0.post1
+  - python-graphviz=0.16
+
